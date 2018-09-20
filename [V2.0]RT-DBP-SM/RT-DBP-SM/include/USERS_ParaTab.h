@@ -492,10 +492,11 @@ struct  COUNT_SYSTEM{
 	Uint16 DelayPWMRecRun;
 	Uint16 DelaySpareLLCPulse;
 	Uint16 DelayOutInLP;
+	Uint16 PwmInvRun;
 };
 
 struct  REGS_SYSTEM{
-	int16 OutVolThetaSum;
+	int32 OutVolThetaSum;
 	int16 OutVolTheta;
 	int16 OutVolWeReal;
 	int16 OutVolWeRef;

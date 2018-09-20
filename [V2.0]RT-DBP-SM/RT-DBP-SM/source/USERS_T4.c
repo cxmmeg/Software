@@ -153,6 +153,8 @@ interrupt void Timer1_ISR(void)
 	SCICRcvDeal();
 	SaveT4VarToPara();
 
+	GPIOOutOfDSP(FAN_KM, ON);				// 风机开
+
 	/*------------------------状态向量表运行--------------------------*/
 	switch (SystemState)
 	{
@@ -202,7 +204,7 @@ interrupt void Timer1_ISR(void)
 					FlagSystem.bit.LastErr = 0;
 				}
 
-				InVolProtect();
+//				InVolProtect();
 
 				FlagSystem.bit.PreChgOk = PreCharge(DataBuf.Udc1, ParaTable.RunCtrlReg.uInVolPreChg, (Uint16 *)&CountSystem.ACPreChg, PRE_CHARGE_KM);
 //				FlagSystem.bit.PreChgOk = 1;
@@ -211,7 +213,7 @@ interrupt void Timer1_ISR(void)
 					GPIOOutOfDSP(MAIN_CIRCUIT_KM, ON);
 				}
 
-				if ((1 == FlagGpioIn.bit.GpioIn1) && (0 == FlagSystem.bit.LastErr))	//  && (1 == FlagGpioIn.bit.GpioIn3) && (1 == FlagGpioIn.bit.GpioIn4)
+				if ((1 == FlagGpioIn.bit.GpioIn1) && (1 == FlagGpioIn.bit.GpioIn3) && (0 == FlagSystem.bit.LastErr))	// && (1 == FlagGpioIn.bit.GpioIn4)
 				{
 					SystemState = SystemRun;
 				}
@@ -253,7 +255,7 @@ interrupt void Timer1_ISR(void)
 				//---------------------//
 				break;
 			}
-		case SystemFault:								// 故障处理
+		case SystemFault:									// 故障处理
 			{
 				SysStateLedDisplay(STANDBY_LED_OFF, RUN_LED_OFF, FAULT_LED_ON);
 				GPIOOutOfDSP(MAIN_CIRCUIT_KM, OFF);			// 主接触器断开
@@ -344,15 +346,28 @@ void RefSet(Uint16 *Real, Uint16 Ref, Uint16 Step)
 	}
 }
 
+/*---------------------------------------------------------------------
+函数原型：void SysStateLedDisplay(int16 StandByState, int16 RunState, int16 FaultState)
+函数名称：系统运行状态灯指示
+函数功能：
+入口参数： StandByState--待机状态LED指示
+	    RunState--运行状态LED指示
+	    FaultState--故障状态LED指示
+出口参数：无
+作    者：
+日    期：
+----------------------------------------------------------------------*/
 void SysStateLedDisplay(int16 StandByState, int16 RunState, int16 FaultState)
 {
-	GPIOOutOfDSP(STANDBY_LED, StandByState);		// 系统STAND BY状态指示
+	GPIOOutOfDSP(STANDBY_LED, StandByState);	// 系统STAND BY状态指示
 	GPIOOutOfDSP(RUN_LED, RunState);			// 系统SYSTEM_RUN状态指示
 	GPIOOutOfDSP(FAULT_LED, FaultState);		// 系统SYSTEM_FAULT状态指示
 }
 
 void FlagInit(void)
 {
+	CountSystem.PwmInvRun = 0;
+
 	FlagSysAlarm.bit.OutSPLLAlarm = 0;
 	RegSystem.OutVolWeRef = 1;
 }
@@ -391,7 +406,7 @@ void SaveT4VarToPara(void)
 	ParaTable.Timer1Reg.uBoost2CurRms	= 4;	// Boost2升压电流有效值
 	ParaTable.Timer1Reg.uBoost3CurRms	= 52;	// Boost3升压电流有效值
 
-    ParaTable.Timer1Reg.uOutVolRms 		= 6;	// 输出电压有效值
+    ParaTable.Timer1Reg.uOutVolRms 		= ((Uint32)PowerInst.UinstReg.Urms * ParaTable.PowerReg.uOutputVol) >> 12;	// 输出电压有效值
 	ParaTable.Timer1Reg.uOutCurRms	   	= 7;	// 输出电流有效值
 	ParaTable.Timer1Reg.uOutFre	    	= ((Uint32)RegSystem.OutVolWeReal * ParaTable.PowerReg.uOutputFre) >> 10;	// 输出频率
 

@@ -755,7 +755,7 @@ void VVVFCal(struct VVVF_REGS *VVVFRegs, int16 VFSet, int16 WeRef, int16 Speed)
 	}
 
 	// 设置角频率值
-	if ((VVVFRegs->WeReal >= 20) && (VVVFRegs->WeReal <= 1475))		// 输出频率必须大于1Hz且小于75Hz--Q10
+	if ((VVVFRegs->WeReal >= 20) && (VVVFRegs->WeReal <= 1228))		// 输出频率必须大于1Hz且小于60Hz--Q10
 	{
 		if (VVVFRegs->WeReal > WeRef)
 		{
@@ -774,9 +774,9 @@ void VVVFCal(struct VVVF_REGS *VVVFRegs, int16 VFSet, int16 WeRef, int16 Speed)
 	{
 		VVVFRegs->WeReal = 20;
 	}
-	else if (VVVFRegs->WeReal > 1475)
+	else if (VVVFRegs->WeReal > 1228)
 	{
-		VVVFRegs->WeReal = 1475;
+		VVVFRegs->WeReal = 1228;
 	}
 
 	// 计算V/F曲线

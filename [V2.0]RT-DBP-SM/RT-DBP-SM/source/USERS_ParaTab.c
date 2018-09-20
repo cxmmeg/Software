@@ -50,7 +50,7 @@ void WtiteDefaultToFlash(void)
 
 	ParaTable.PowerReg.uOutputType 		= 0;			// 输出电源类型
 	ParaTable.PowerReg.uOutputFre 		= 500;			// 输出电源额定频率，单位0.1Hz
-	ParaTable.PowerReg.uOutputVol		= 4400;			// 输出电源额定电压，单位0.1V
+	ParaTable.PowerReg.uOutputVol		= 3800;			// 输出电源额定电压，单位0.1V
 	ParaTable.PowerReg.uOutputCur		= 3280;			// 输出电源额定电流，单位0.1A
 	temp = (int32)ParaTable.PowerReg.uOutputVol * ParaTable.PowerReg.uOutputCur;
 	ParaTable.PowerReg.uOutputPower 	= temp * 0.01732;// 输出电源功率 实际值，单位1W
@@ -142,7 +142,7 @@ void WtiteDefaultToFlash(void)
 	ParaTable.RunCtrlReg.XSMaxSpeed			= 1024;		// 速度满量程值
 
 	ParaTable.RunCtrlReg.uSpeedRatio		= 20;		// 升/降频速度，1~100对应慢~块
-	ParaTable.RunCtrlReg.uVVVFVfSet			= 44;		// VVVF的V/F值设置，单位0.1
+	ParaTable.RunCtrlReg.uVVVFVfSet			= 76;		// VVVF的V/F值设置，单位0.1
 
 	// 延迟报警/保护参数默认值
 	ParaTable.DelayCtrlReg.uInVolAlarm		= 1000;		// 输入电压报警延迟值	@3ms

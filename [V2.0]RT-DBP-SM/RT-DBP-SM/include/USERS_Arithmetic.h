@@ -272,6 +272,8 @@ struct VVVF_REGS{
 	int16 Count;
 	int16 WeReal;
 	int16 Uref;
+
+	struct PI_REGS 	VolPI;
 };
 
 //------------------------------------------------------------

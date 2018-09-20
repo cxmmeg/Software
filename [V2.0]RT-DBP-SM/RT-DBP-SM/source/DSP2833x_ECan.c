@@ -358,8 +358,8 @@ void CanDataSave(void)
 	static Uint16 UdcVolIn = 0, 	UacVolOut = 0, 		UacCurOut = 0, 		UacFreOut = 0;
 	static Uint32 SumUdcVolIn = 0, 	SumUacVolOut = 0, 	SumUacCurOut = 0, 	SumUacFreOut = 0;
 
-	SumUdcVolIn  += ParaTable.Timer1Reg.uInVolRms;
-	SumUacVolOut += ParaTable.Timer1Reg.uOutVolRms;
+	SumUdcVolIn  += (ParaTable.Timer1Reg.uInVolRms / 10);
+	SumUacVolOut += (ParaTable.Timer1Reg.uOutVolRms / 10);
 	SumUacCurOut += ParaTable.Timer1Reg.uOutCurRms;
 	SumUacFreOut += ParaTable.Timer1Reg.uOutFre;
 

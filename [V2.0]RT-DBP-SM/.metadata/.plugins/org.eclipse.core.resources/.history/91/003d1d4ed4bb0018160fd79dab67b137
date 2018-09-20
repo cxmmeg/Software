@@ -1,0 +1,208 @@
+/*****************头文件********************/ 
+#include <string.h>
+#include "DSP2833x_Device.h"     
+#include "DSP2833x_Examples.h"   
+
+#pragma DATA_SECTION(ParaTable,".ParaTab")
+struct PARAMETER_REGS ParaTable;
+
+extern enum   SYSTEM_STATE 	SystemState;
+extern union  FLAG_SYSTEM   FlagSystem;
+/*---------------------------------------------------------------------
+函数原型：ReadParaFromFlash
+函数名称：read the parameter from the flash;
+if the flash is not empty, then read the parameter from the flash and then run;
+函数功能：
+入口参数：无
+出口参数：无
+作    者：
+日    期：
+----------------------------------------------------------------------*/
+void ReadParaFromFlash(void)
+{
+	int *ParPoint;
+	ParPoint = (int *)&ParaTable;					//获取参数表的首地址；
+	FlashRead(ParPoint,0x0,sizeof(ParaTable));		//从flash读取整个参数表；
+}
+
+/*---------------------------------------------------------------------
+函数原型：WtiteDefaultToFlash
+函数名称：初始化整个参数表，将参数表写入flash
+函数功能：
+入口参数：无
+出口参数：无
+作    者：
+日    期：
+----------------------------------------------------------------------*/
+void WtiteDefaultToFlash(void)
+{
+	int *ParPoint;
+	int32 temp;
+
+	ParPoint = (int *)&ParaTable;
+	memset(&ParaTable,0x00,sizeof(ParaTable));
+
+	// 常规参数设计
+	ParaTable.PowerReg.uInputType 		= 1;			// 输入电源类型 0-AC，1-DC
+	ParaTable.PowerReg.uInputFre 		= 0;			// 输入电源额定频率，单位0.1Hz
+	ParaTable.PowerReg.uInputVol		= 5380;			// 输入电源额定电压，单位0.1V
+	ParaTable.PowerReg.uInputCur		= 7000;			// 输入电源额定电流，单位0.1A
+
+	ParaTable.PowerReg.uOutputType 		= 0;			// 输出电源类型
+	ParaTable.PowerReg.uOutputFre 		= 500;			// 输出电源额定频率，单位0.1Hz
+	ParaTable.PowerReg.uOutputVol		= 3800;			// 输出电源额定电压，单位0.1V
+	ParaTable.PowerReg.uOutputCur		= 3280;			// 输出电源额定电流，单位0.1A
+	temp = (int32)ParaTable.PowerReg.uOutputVol * ParaTable.PowerReg.uOutputCur;
+	ParaTable.PowerReg.uOutputPower 	= temp * 0.01732;// 输出电源功率 实际值，单位1W
+
+	ParaTable.PowerReg.uBoostVol 		= 6600;			// Boost升压额定电压，单位0.1V
+	ParaTable.PowerReg.uBoostCur		= 2800;			// Boost升压额定电流，单位0.1A
+	ParaTable.PowerReg.uSpeedMax		= 1000;			// 变频器负载电机最高转速，单位1r/s
+	ParaTable.PowerReg.uSpeedMin		= 100;			// 变频器负载电机最低转速，单位1r/s
+	ParaTable.PowerReg.uSpeedSet		= 800;			// 变频器负载电机设定转速，单位1r/s
+	ParaTable.PowerReg.uTempNom			= 750;			// 正常温度值，单位0.1℃
+
+	ParaTable.PowerReg.uPWMSwitchFreq 		= 6400;			// PWM开关频率，单位1Hz
+	ParaTable.PowerReg.uPWMSwitchPeriod		= 1E6 / 6400;	// PWM开关周期，单位1us
+	ParaTable.PowerReg.uPWMSwitchDeadTime	= 2200;			// PWM开关死区时间，单位1ns
+
+	ParaTable.PowerReg.uBoostSwitchFreq		= 25600;		// Boost开关频率，单位1Hz
+	ParaTable.PowerReg.uBoostSwitchPeriod	= 1E6 / 25600;	// Boost开关周期，单位1us
+	ParaTable.PowerReg.uBoostSwitchDeadTime	= 500;			// Boost开关死区时间，单位1ns
+
+	ParaTable.PowerReg.uParaTableVer		= 1;			// 初始化为1
+    ParaTable.PowerReg.uHardwareVer         = 20;           // 硬件版本号，针对V2.0版本
+	ParaTable.PowerReg.uSoftwareVer		    = 18081;		// 软件版本号，xx年xx月第x次修改
+
+	// PI参数设计
+	ParaTable.PIReg.uBoostVolKp		= 3000;			// Boost电压环
+	ParaTable.PIReg.uBoostVolKi		= 10;			// Q12
+	ParaTable.PIReg.uBoostVolKd 	= 10; 			// Q12
+	ParaTable.PIReg.uBoostVolPIMax	= 4000; 		// Q12
+	ParaTable.PIReg.uBoostVolPIMin	= 10; 			// Q12
+
+	ParaTable.PIReg.uOutVolKp 		= 3000; 		// 输出电压环
+	ParaTable.PIReg.uOutVolKi 		= 10;			// Q12
+	ParaTable.PIReg.uOutVolKd 		= 10;			// Q12
+	ParaTable.PIReg.uOutVolPIMax 	= 4000;			// Q12
+	ParaTable.PIReg.uOutVolPIMin 	= -4000; 		// Q12
+
+	ParaTable.PIReg.uOutCurKp 		= 3000; 		// 输出电流环
+	ParaTable.PIReg.uOutCurKi 		= 10;			// Q12
+	ParaTable.PIReg.uOutCurKd 		= 10;			// Q12
+	ParaTable.PIReg.uOutCurPIMax 	= 4000;			// Q12
+	ParaTable.PIReg.uOutCurPIMin 	= -4000; 		// Q12
+
+	ParaTable.PIReg.uOutPLLKp 		= 3000; 		// 输出电压锁相环
+	ParaTable.PIReg.uOutPLLKi 		= 10;			// Q12
+	ParaTable.PIReg.uOutPLLKd 		= 10;			// Q12
+	ParaTable.PIReg.uOutPLLPIMax 	= 4000;			// Q12
+	ParaTable.PIReg.uOutPLLPIMin 	= -4000; 		// Q12
+
+	// 运行控制参数默认值
+	ParaTable.RunCtrlReg.uInVolPreChg		= 3481;		// 输入电压预充电电压值，85%380V   Q12
+	ParaTable.RunCtrlReg.uInVolHighAlarm	= 4505;		// 输入过压报警值，110%380V  Q12
+	ParaTable.RunCtrlReg.uInVolHighCut		= 5324;		// 输入过压切断值，130%380V  Q12
+	ParaTable.RunCtrlReg.uInVolLowAlarm		= 3686;		// 输入欠压报警值，90%380V   Q12
+	ParaTable.RunCtrlReg.uInVolLowCut		= 3276;		// 输入欠压切断值，80%380V   Q12
+	ParaTable.RunCtrlReg.uInCurHighAlarm	= 4505;		// 输入过流报警值，110%380V  Q12
+	ParaTable.RunCtrlReg.uInCurHighCut		= 5324;		// 输入过流切断值，130%380V  Q12
+
+	ParaTable.RunCtrlReg.uBoostVolHighAlarm	= 4505;		// Boost升压过压报警值，110%380V  Q12
+	ParaTable.RunCtrlReg.uBoostVolHighCut	= 5324;		// Boost升压过压切断值，130%380V  Q12
+	ParaTable.RunCtrlReg.uBoostCurHighAlarm	= 4505;		// Boost升压过流报警值，110%380V  Q12
+	ParaTable.RunCtrlReg.uBoostCurHighCut	= 5324;		// Boost升压过流切断值，130%380V  Q12
+
+	ParaTable.RunCtrlReg.uOutVolHighAlarm	= 4505;		// 输出过压报警值，110%380V  Q12
+	ParaTable.RunCtrlReg.uOutVolHighCut	    = 5324;		// 输出过压切断值，130%380V  Q12
+	ParaTable.RunCtrlReg.uOutVolLowAlarm	= 3686;		// 输出欠压报警值，90%380V   Q12
+	ParaTable.RunCtrlReg.uOutVolLowCut		= 3276;		// 输出欠压切断值，80%380V   Q12
+	ParaTable.RunCtrlReg.uOutCurHighAlarm	= 4505;		// 输出过流报警值，110%380V  Q12
+	ParaTable.RunCtrlReg.uOutCurHighCut		= 1000;		// 输出过流切断值，130%380V  Q12
+
+	ParaTable.RunCtrlReg.uTempFanOpen		= 500;		// 风扇开启温度 ，单位0.1℃
+	ParaTable.RunCtrlReg.uTempAlarm			= 900;		// 过温报警值，单位0.1℃
+	ParaTable.RunCtrlReg.uTempCut			= 1000;		// 过温切断值，单位0.1℃
+
+    ParaTable.RunCtrlReg.uVolOutLPLow       = 1400;     // 输出缺相检测下限值
+    ParaTable.RunCtrlReg.uVolOutLPUp		= 2800;		// 输出缺相检测上限值
+    ParaTable.RunCtrlReg.uFreUnusualLow		= 972;		// 频率异常下限值
+    ParaTable.RunCtrlReg.uFreUnusualUp		= 1076;		// 频率异常上限值
+
+	ParaTable.RunCtrlReg.bCtrlModeSet		= 0;		// 控制模式设定 0--本地模式；1--遥控模式
+	ParaTable.RunCtrlReg.bDirectionSet		= 0;		// 电机运转方向设定 0--正转；1--反转
+	ParaTable.RunCtrlReg.bFreSourceSet		= 0;		// 输出主频率来源设定 0--模拟量；1--数字量
+
+	ParaTable.RunCtrlReg.XSMaxInVol			= 10000;	// 输入电压满量程值
+	ParaTable.RunCtrlReg.XSMaxInCur			= 6800;		// 输入电流满量程值
+	ParaTable.RunCtrlReg.XSMaxBoostCur		= 6800;		// Bosst升压电流满量程值
+	ParaTable.RunCtrlReg.XSMaxOutVol		= 10000;	// 输出电压满量程值
+	ParaTable.RunCtrlReg.XSMaxOutCur		= 10000;	// 输出电流满量程值
+	ParaTable.RunCtrlReg.XSMaxNTCTemp		= 6800;		// 温度满量程值
+	ParaTable.RunCtrlReg.XSMaxSpeed			= 1024;		// 速度满量程值
+
+	ParaTable.RunCtrlReg.uSpeedRatio		= 20;		// 升/降频速度，1~100对应慢~块
+	ParaTable.RunCtrlReg.uVVVFVfSet			= 44;		// VVVF的V/F值设置，单位0.1
+
+	// 延迟报警/保护参数默认值
+	ParaTable.DelayCtrlReg.uInVolAlarm		= 1000;		// 输入电压报警延迟值	@3ms
+	ParaTable.DelayCtrlReg.uInVolCut		= 200;		// 输入电压切断延迟值	@3ms
+	ParaTable.DelayCtrlReg.uInCurAlarm		= 1000;		// 输入电流报警延迟值	@3ms
+	ParaTable.DelayCtrlReg.uInCurCut		= 200;		// 输入电流切断延迟值	@3ms
+
+	ParaTable.DelayCtrlReg.uBoostVolAlarm	= 1000;		// Boost升压电压报警延迟值	@3ms
+	ParaTable.DelayCtrlReg.uBoostVolCut		= 200;		// Boost升压电压切断延迟值	@3ms
+	ParaTable.DelayCtrlReg.uBoostCurAlarm	= 1000;		// Boost升压电流报警延迟值	@3ms
+	ParaTable.DelayCtrlReg.uBoostCurCut		= 200;		// Boost升压电流切断延迟值	@3ms
+
+	ParaTable.DelayCtrlReg.uOutVolAlarm		= 1000;		// 输出电压报警延迟值	@3ms
+	ParaTable.DelayCtrlReg.uOutVolCut		= 200;		// 输出电压切断延迟值	@3ms
+	ParaTable.DelayCtrlReg.uOutCurAlarm		= 1000;		// 输出电流报警延迟值	@3ms
+	ParaTable.DelayCtrlReg.uOutCurCut		= 200;		// 输出电流切断延迟值	@3ms
+
+    ParaTable.DelayCtrlReg.uTempAlarm    	= 1000;     // 过温报警延迟值	@3ms
+    ParaTable.DelayCtrlReg.uTempCut      	= 200;      // 过温切断延迟值	@3ms
+
+    ParaTable.DelayCtrlReg.uVolOutLP		= 500;		// 输出缺相延迟报警值	@3ms
+	ParaTable.DelayCtrlReg.uFreUnusual		= 200;		// 频率异常报警延迟值	@3ms
+
+    // 重要数据保存参数组 64
+	ParaTable.EmergencyReg.uEmDataSize      = 128;      // 重要数据存储区域大小128K
+	ParaTable.EmergencyReg.uEmDataNumMax    = 8;        // 重要数据最大存储个数8个
+	ParaTable.EmergencyReg.uEmDataSaveTime  = 16 * 1024 / 3600; // 重要数据保存时间 4.55s
+    ParaTable.EmergencyReg.uEmData0Addr     = 1;
+    ParaTable.EmergencyReg.uEmData1Addr     = 2;
+    ParaTable.EmergencyReg.uEmData2Addr     = 3;
+    ParaTable.EmergencyReg.uEmData3Addr     = 4;
+    ParaTable.EmergencyReg.uEmData4Addr     = 5;
+    ParaTable.EmergencyReg.uEmData5Addr     = 6;
+    ParaTable.EmergencyReg.uEmData6Addr     = 7;
+    ParaTable.EmergencyReg.uEmData7Addr     = 8;
+
+	SectorErase(0x00);
+	DelayUs(1000);
+	FlashWrite(ParPoint,0x00,sizeof(ParaTable));					// 整个参数表写入flash；
+}
+
+/*---------------------------------------------------------------------
+函数原型：
+函数名称：
+函数功能：更新被修改的参数到flash;
+入口参数：无
+出口参数：无
+作    者：
+日    期：
+----------------------------------------------------------------------*/
+int UpdataParaToFlash(void)
+{
+	//判断在未运行并且参数被修改时，将整个参数表写入flash
+	if ((SystemState != SystemRun) && (FlagSystem.bit.ParaDataChg == 1))
+	{
+		FlagSystem.bit.ParaDataChg = 0;
+		SectorErase(0x00);
+
+		FlashWrite((int *)&ParaTable, 0x00, sizeof(ParaTable));		//整个参数表写入flash；
+		return 1;
+	}
+	return 0;
+}

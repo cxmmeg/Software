@@ -1,0 +1,261 @@
+/*****************头文件********************/
+
+#include "DSP2833x_Device.h"     
+#include "DSP2833x_Examples.h"
+
+extern struct AD_BUFS                   DataInst;
+extern struct AD_BUFS                   DataZero;
+extern struct AD_BUFS                   DataBuf;
+extern struct AD_BUFS                   DataFactor;
+extern struct AD_BUFS                   DataNormal;
+extern struct AD_BUFS                   DataMax;
+
+extern union  FLAG_GPIOIN   	 		FlagGpioIn;
+
+extern union  FLAG_SYSTEM_INITERR 		FlagSysInitErr;
+extern union  FLAG_SYSTEM_RUNERR 		FlagSysRunErr;
+extern union  FLAG_SYSTEM				FlagSystem;
+extern union  FLAG_SYSTEM_ALARM			FlagSysAlarm;
+extern union  FLAG_SYSTEM_PDPERR		FlagSysPDPErr;
+
+extern struct COUNT_SYSTEM				CountSystem;
+extern struct REGS_SYSTEM               RegSystem;
+extern enum   SYSTEM_STATE 				SystemState;
+
+extern struct INSTANT_POWER 			PowerInst;
+extern struct SVPWM_REGS 				SvpwmReg;
+extern struct VVVF_REGS 				VVVFReg;
+
+extern int16  SinTab[1024];
+extern int16 *EmDataAddrArray[8];
+
+void 	SaveT1VarToPara(void);								// 更新参数表
+Uint16  MotorSoftStart(Uint16 channel, struct SPLL_REGS *spllreg, Uint16 init_alpha, int16 step_time);
+
+void InitT1Var(void)
+{
+    // SVPWM寄存器初始赋值
+	SvpwmReg.EPwm1TBPRD = EPwm1Regs.TBPRD;
+	SvpwmReg.EPwm2TBPRD = EPwm2Regs.TBPRD;
+	SvpwmReg.EPwm3TBPRD = EPwm3Regs.TBPRD;
+
+	// 输出功率寄存器初始赋值
+    PowerInst.Period	= 128;
+
+    // VVVF寄存器初始赋值
+    VVVFReg.FreNom			= ParaTable.PowerReg.uOutputFre;
+    VVVFReg.VolNom			= ParaTable.PowerReg.uOutputVol;
+    VVVFReg.AccelerationMax	= 100;
+    VVVFReg.VolPI.Kp		= ParaTable.PIReg.uOutVolKp;
+    VVVFReg.VolPI.Ki		= ParaTable.PIReg.uOutVolKi;
+    VVVFReg.VolPI.Kc		= (int32)ParaTable.PIReg.uOutVolKi * 4096 / ParaTable.PIReg.uOutVolKp;
+    VVVFReg.VolPI.PIMax		= ParaTable.PIReg.uOutVolPIMax;
+    VVVFReg.VolPI.PIMin		= ParaTable.PIReg.uOutVolPIMin;
+}
+
+#pragma CODE_SECTION(ReadT1VarFromPara, "ramcode")
+
+void  ReadT1VarFromPara(void)
+{
+	if(ParaTable.EmergencyReg.uEmDataChgEnable == 0x5555)
+	{
+	    FlagSystem.bit.EmDataChgFlag = 1;
+	}
+	else
+	{
+	    FlagSystem.bit.EmDataChgFlag = 0;
+	}
+}
+
+/*---------------------------------------------------------------------
+函数原型：interrupt void ePWM1ISR(void)
+函数名称：epwm1中断
+函数功能：
+入口参数：无
+出口参数：无
+作    者：
+日    期：
+----------------------------------------------------------------------*/
+#pragma CODE_SECTION(ePWM1ISR, "ramcode")
+
+interrupt void ePWM1ISR(void)
+{
+	int16 i, temp;
+    int16 *pDataBuf, *pDataInst, *pDataZero, *pDataFactor;
+
+	DINT;
+	EPwm1Regs.ETCLR.bit.INT = 1;					// 清除定时器INT标识
+	PieCtrlRegs.PIEACK.all  = PIEACK_GROUP3;		// 清除INT3应答
+	CpuTimer2Regs.TIM.all	= CpuTimer2Regs.PRD.all;
+
+	/**********************项目程序*********************/
+
+    // AD采样数据读取及处理
+    ADSampleOfDMA();
+    ReadT1VarFromPara();
+
+    // 原始数据标幺计算
+    pDataBuf  = (int16 *)&DataBuf;
+    pDataInst = (int16 *)&DataInst;
+    pDataZero = (int16 *)&DataZero;
+    pDataFactor = (int16 *)&DataFactor;
+    for (i = 0; i < 10; i++, pDataBuf++, pDataInst++, pDataZero++, pDataFactor++)
+    {
+        temp = (int32)(*pDataInst - *pDataZero) * (*pDataFactor) >> 9;      // Q11 * Q10 >> 9 = Q12
+        *pDataBuf = ((int32)*pDataBuf * 3 + temp) >> 2;
+    }
+
+    SaveT1VarToPara();
+    T1VarSave();
+    T1EmergencySave(FlagSysRunErr.bit.FlagPDP);
+
+    /*----------------------算法写在我下面-------------------------*/
+// 1、计算V/F曲线、SVPWM脉冲
+    VVVFCal(&VVVFReg, RegSystem.VVVFVfSet, RegSystem.OutVolWeRef, RegSystem.SpeedRatio);
+
+	RegSystem.OutVolWeReal = VVVFReg.WeReal;							// 角频率赋值  Q10
+	RegSystem.OutVolThetaSum += RegSystem.OutVolWeReal;
+	RegSystem.OutVolTheta = ((int32)RegSystem.OutVolThetaSum >> 7) & 0x03ff;
+	if (RegSystem.OutVolTheta < 0)
+	{
+		RegSystem.OutVolTheta = RegSystem.OutVolTheta + 1024;
+	}
+
+	RegSystem.OutVolSina = SinTab[RegSystem.OutVolTheta];               // sin值	Q12
+	RegSystem.OutVolCosa = SinTab[(RegSystem.OutVolTheta + 256) & 0x03ff];
+
+// 2、计算每路模块温度值
+//	RegSystem.TempARms = URmsCalc(DataBuf.TempA , &ModATempRegs, 128);
+//	RegSystem.TempBRms = URmsCalc(DataBuf.TempB , &ModBTempRegs, 128);
+
+	if (SystemState == SystemRun)	// 中断占用太多时间，导致无法运行SCI接收中断，需要在不用时屏蔽。
+	{
+		// 3、计算输出有功、无功
+		PowerCal(&PowerInst, RegSystem.OutVolTheta, DataBuf.Uab, DataBuf.Ubc, DataBuf.Ia, DataBuf.Ic);
+
+		// 4、计算SVPWM脉冲,开PWM脉冲
+		PICal(&VVVFReg.VolPI, PowerInst.UinstReg.Urms, VVVFReg.Uref);		// 输出电压有效值PI环
+	//	svpwm(&SvpwmReg, VVVFReg.VolPI.Output, 0, RegSystem.OutVolSina, RegSystem.OutVolCosa);
+
+		svpwm(&SvpwmReg, VVVFReg.Uref, 0, RegSystem.OutVolSina, RegSystem.OutVolCosa);
+		EPwm1Regs.CMPA.half.CMPA = SvpwmReg.T_CMPR1;
+		EPwm2Regs.CMPA.half.CMPA = SvpwmReg.T_CMPR2;
+		EPwm3Regs.CMPA.half.CMPA = SvpwmReg.T_CMPR3;
+
+		EnablePWM(EPWM_CH123);
+		GPIOOutOfDSP(EN_DRIVER, 1);
+	}
+	else
+	{
+		DisablePWM(EPWM_ALL);
+		GPIOOutOfDSP(EN_DRIVER, 0);
+
+		VVVFReg.WeReal = 20;
+	}
+
+	/*************************END**********************/
+
+	CountSystem.T1Cycle = (CpuTimer2Regs.PRD.all - CpuTimer2Regs.TIM.all) * 0.0066;			// us
+
+	EINT;
+}
+
+/*---------------------------------------------------------------------
+函数原型：interrupt void TZ1ISR(void)
+函数名称：TZ1中断
+函数功能：
+入口参数：无
+出口参数：无
+作    者：
+日    期：
+----------------------------------------------------------------------*/
+interrupt void TZ1ISR(void)
+{
+   	PieCtrlRegs.PIEACK.all = PIEACK_GROUP2;
+
+   	FlagSysRunErr.bit.FlagPDP = 1;
+	DisablePWM(EPWM_ALL);              	// close all the pwm pulse;
+
+	FlagSysPDPErr.all = (~ReadCPLDSTS()) & 0xff;
+
+	EALLOW;
+   	EPwm1Regs.TZCLR.all = 0x07;
+    EPwm2Regs.TZCLR.all = 0x07;
+    EPwm3Regs.TZCLR.all = 0x07;
+    EPwm4Regs.TZCLR.all = 0x07;
+    EPwm5Regs.TZCLR.all = 0x07;
+    EPwm6Regs.TZCLR.all = 0x07;
+	EDIS;
+
+	// Enable PIE: Group 2 interrupt 1
+	PieCtrlRegs.PIEIER2.bit.INTx1 = 0;
+}
+
+/*---------------------------------------------------------------------
+函数原型：void SaveT1VarToPara(void)
+函数名称：保存PWM中断数据至参数表
+函数功能：
+入口参数：
+出口参数：无
+作    者：
+日    期：2015年12月
+----------------------------------------------------------------------*/
+#pragma CODE_SECTION(SaveT1VarToPara, "ramcode")
+
+void SaveT1VarToPara(void)
+{
+	ParaTable.PWMReg.uInVol 	    = DataBuf.Udc1;
+	ParaTable.PWMReg.uInCur 	    = DataBuf.Udc2;
+	ParaTable.PWMReg.uBoost1Cur	    = 0;
+	ParaTable.PWMReg.uBoost2Cur		= 0;
+	ParaTable.PWMReg.uBoost3Cur		= 0;
+	ParaTable.PWMReg.uOutUab		= DataBuf.Uab;
+	ParaTable.PWMReg.uOutUbc      	= DataBuf.Ubc;
+	ParaTable.PWMReg.uOutIAl      	= DataBuf.Ia;
+	ParaTable.PWMReg.uOutIBl      	= 0;
+	ParaTable.PWMReg.uOutICl 	    = DataBuf.Ic;
+
+	ParaTable.PWMReg.uOutIAc 	    = DataBuf.Iu;
+	ParaTable.PWMReg.uOutIBc 	    = 0;
+	ParaTable.PWMReg.uOutICc	    = DataBuf.Iw;
+	ParaTable.PWMReg.uOutUd		    = PowerInst.UinstReg.UsdFine;
+	ParaTable.PWMReg.uOutUq		    = PowerInst.UinstReg.UsqFine;
+	ParaTable.PWMReg.uOutTheta		= RegSystem.OutVolTheta;
+
+	ParaTable.PWMReg.uOutInstActivePower 	= PowerInst.PowerInstP;
+	ParaTable.PWMReg.uOutInstReactivePower 	= PowerInst.PowerInstQ;
+	ParaTable.PWMReg.uOutAvgActivePower 	= PowerInst.PowerAvgP;
+	ParaTable.PWMReg.uOutAvgReactivePower 	= PowerInst.PowerAvgQ;
+
+	ParaTable.PWMReg.uModATemp 	    = 255;
+	ParaTable.PWMReg.uModBTemp 	    = 222;
+	ParaTable.PWMReg.uT1UseTime	    = CountSystem.T1Cycle;
+
+    ParaTable.PWMReg.uActiveReg0    = SvpwmReg.T_CMPR1;
+	ParaTable.PWMReg.uActiveReg1    = SvpwmReg.T_CMPR2;
+	ParaTable.PWMReg.uActiveReg2    = SvpwmReg.T_CMPR3;
+	ParaTable.PWMReg.uActiveReg3    = RegSystem.OutVolWeRef;
+	ParaTable.PWMReg.uActiveReg4    = VVVFReg.WeReal;
+	ParaTable.PWMReg.uActiveReg5    = VVVFReg.Uref;
+	ParaTable.PWMReg.uActiveReg6    = PowerInst.UinstReg.Urms;
+	ParaTable.PWMReg.uActiveReg7    = VVVFReg.VolPI.Output;
+	ParaTable.PWMReg.uActiveReg8    = 0;
+	ParaTable.PWMReg.uActiveReg9    = 0;
+
+/*----------------------------------------------------------*
+*                   以下为重要数据掉电保存，不允许修改               *
+*-----------------------------------------------------------*/
+	ParaTable.EmergencyReg.uEmCountBlock = EmgcRamReg.CountBlock;
+	ParaTable.EmergencyReg.uEmCountRam   = EmgcRamReg.CountRam;
+	ParaTable.EmergencyReg.uEmData0Addr  = (int16)((int32)EmDataAddrArray[0] & 0x0000ffff);
+	ParaTable.EmergencyReg.uEmData1Addr  = (int16)((int32)EmDataAddrArray[1] & 0x0000ffff);
+	ParaTable.EmergencyReg.uEmData2Addr  = (int16)((int32)EmDataAddrArray[2] & 0x0000ffff);
+	ParaTable.EmergencyReg.uEmData3Addr  = (int16)((int32)EmDataAddrArray[3] & 0x0000ffff);
+	ParaTable.EmergencyReg.uEmData4Addr  = (int16)((int32)EmDataAddrArray[4] & 0x0000ffff);
+	ParaTable.EmergencyReg.uEmData5Addr  = (int16)((int32)EmDataAddrArray[5] & 0x0000ffff);
+	ParaTable.EmergencyReg.uEmData6Addr  = (int16)((int32)EmDataAddrArray[6] & 0x0000ffff);
+	ParaTable.EmergencyReg.uEmData7Addr  = (int16)((int32)EmDataAddrArray[7] & 0x0000ffff);
+	ParaTable.EmergencyReg.uEmDataChgFlag        = FlagSystem.bit.EmDataChgFlag;
+	ParaTable.EmergencyReg.uEmDataSaveFinishFlag = EmgcRamReg.FlagDataSaveFinish;
+	ParaTable.EmergencyReg.uEmDataFlashWriteOK   = FlagSystem.bit.EmDataFlashWriteOK;
+}

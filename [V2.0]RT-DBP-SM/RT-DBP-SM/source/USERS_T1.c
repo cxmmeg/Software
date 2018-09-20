@@ -46,6 +46,11 @@ void InitT1Var(void)
     VVVFReg.FreNom			= ParaTable.PowerReg.uOutputFre;
     VVVFReg.VolNom			= ParaTable.PowerReg.uOutputVol;
     VVVFReg.AccelerationMax	= 100;
+    VVVFReg.VolPI.Kp		= ParaTable.PIReg.uOutVolKp;
+    VVVFReg.VolPI.Ki		= ParaTable.PIReg.uOutVolKi;
+    VVVFReg.VolPI.Kc		= (int32)ParaTable.PIReg.uOutVolKi * 4096 / ParaTable.PIReg.uOutVolKp;
+    VVVFReg.VolPI.PIMax		= ParaTable.PIReg.uOutVolPIMax;
+    VVVFReg.VolPI.PIMin		= ParaTable.PIReg.uOutVolPIMin;
 }
 
 #pragma CODE_SECTION(ReadT1VarFromPara, "ramcode")
@@ -105,24 +110,19 @@ interrupt void ePWM1ISR(void)
     T1EmergencySave(FlagSysRunErr.bit.FlagPDP);
 
     /*----------------------算法写在我下面-------------------------*/
-// 1、计算V/F曲线、SVPWM脉冲
+// 1、计算V/F曲线
     VVVFCal(&VVVFReg, RegSystem.VVVFVfSet, RegSystem.OutVolWeRef, RegSystem.SpeedRatio);
 
-	RegSystem.OutVolWeReal = VVVFReg.WeReal;							// 角频率赋值
+	RegSystem.OutVolWeReal = VVVFReg.WeReal;							// 角频率赋值  Q10
 	RegSystem.OutVolThetaSum += RegSystem.OutVolWeReal;
-	RegSystem.OutVolTheta = ((int32)RegSystem.OutVolThetaSum >> 8) & 0x03ff;
+	RegSystem.OutVolTheta = ((int32)RegSystem.OutVolThetaSum >> 7) & 0x03ff;
 	if (RegSystem.OutVolTheta < 0)
 	{
 		RegSystem.OutVolTheta = RegSystem.OutVolTheta + 1024;
 	}
 
-	RegSystem.OutVolSina = SinTab[RegSystem.OutVolTheta];               	// sin值	Q12
+	RegSystem.OutVolSina = SinTab[RegSystem.OutVolTheta];               // sin值	Q12
 	RegSystem.OutVolCosa = SinTab[(RegSystem.OutVolTheta + 256) & 0x03ff];
-
-	svpwm(&SvpwmReg, VVVFReg.Uref, 0, RegSystem.OutVolSina, RegSystem.OutVolCosa);
-	EPwm1Regs.CMPA.half.CMPA = SvpwmReg.T_CMPR1;
-	EPwm2Regs.CMPA.half.CMPA = SvpwmReg.T_CMPR2;
-	EPwm3Regs.CMPA.half.CMPA = SvpwmReg.T_CMPR3;
 
 // 2、计算每路模块温度值
 //	RegSystem.TempARms = URmsCalc(DataBuf.TempA , &ModATempRegs, 128);
@@ -133,19 +133,34 @@ interrupt void ePWM1ISR(void)
 		// 3、计算输出有功、无功
 		PowerCal(&PowerInst, RegSystem.OutVolTheta, DataBuf.Uab, DataBuf.Ubc, DataBuf.Ia, DataBuf.Ic);
 
-		// 4、开PWM脉冲
-		EnablePWM(EPWM_CH123);
-		GPIOOutOfDSP(EN_DRIVER, 1);
+		// 4、计算SVPWM脉冲,开PWM脉冲
+		PICal(&VVVFReg.VolPI, PowerInst.UinstReg.Urms, VVVFReg.Uref);		// 输出电压有效值PI环
+		svpwm(&SvpwmReg, VVVFReg.VolPI.Output, 0, RegSystem.OutVolSina, RegSystem.OutVolCosa);
+//		svpwm(&SvpwmReg, VVVFReg.Uref, 0, RegSystem.OutVolSina, RegSystem.OutVolCosa);
 
-		CountSystem.T1Cycle = (CpuTimer2Regs.PRD.all - CpuTimer2Regs.TIM.all) * 0.0066;			// us
-		EINT;
+		EPwm1Regs.CMPA.half.CMPA = SvpwmReg.T_CMPR1;
+		EPwm2Regs.CMPA.half.CMPA = SvpwmReg.T_CMPR2;
+		EPwm3Regs.CMPA.half.CMPA = SvpwmReg.T_CMPR3;
+
+		EnablePWM(EPWM_CH123);
+		if (++CountSystem.PwmInvRun >= 2)					// 躲过第一个脉冲不稳定的时间
+		{
+			CountSystem.PwmInvRun = 2;
+			GPIOOutOfDSP(EN_DRIVER, 1);
+		}
 	}
 	else
 	{
 		DisablePWM(EPWM_ALL);
 		GPIOOutOfDSP(EN_DRIVER, 0);
 
+		PowerInst.UinstReg.Urms = 0;
 		VVVFReg.WeReal = 20;
+		VVVFReg.VolPI.PiUi = 0;
+
+		SvpwmReg.T_CMPR1 = 0;
+		SvpwmReg.T_CMPR2 = 0;
+		SvpwmReg.T_CMPR3 = 0;
 	}
 
 	/*************************END**********************/
@@ -213,8 +228,8 @@ void SaveT1VarToPara(void)
 	ParaTable.PWMReg.uOutIAc 	    = DataBuf.Iu;
 	ParaTable.PWMReg.uOutIBc 	    = 0;
 	ParaTable.PWMReg.uOutICc	    = DataBuf.Iw;
-	ParaTable.PWMReg.uOutUd		    = PowerInst.IinstReg.UsdFine;
-	ParaTable.PWMReg.uOutUq		    = PowerInst.IinstReg.UsqFine;
+	ParaTable.PWMReg.uOutUd		    = PowerInst.UinstReg.UsdFine;
+	ParaTable.PWMReg.uOutUq		    = PowerInst.UinstReg.UsqFine;
 	ParaTable.PWMReg.uOutTheta		= RegSystem.OutVolTheta;
 
 	ParaTable.PWMReg.uOutInstActivePower 	= PowerInst.PowerInstP;
@@ -226,14 +241,14 @@ void SaveT1VarToPara(void)
 	ParaTable.PWMReg.uModBTemp 	    = 222;
 	ParaTable.PWMReg.uT1UseTime	    = CountSystem.T1Cycle;
 
-    ParaTable.PWMReg.uActiveReg0    = VVVFReg.WeReal;
-	ParaTable.PWMReg.uActiveReg1    = VVVFReg.Uref;
-	ParaTable.PWMReg.uActiveReg2    = RegSystem.OutVolWeRef;
-	ParaTable.PWMReg.uActiveReg3    = 0;
-	ParaTable.PWMReg.uActiveReg4    = 0;
-	ParaTable.PWMReg.uActiveReg5    = 0;
-	ParaTable.PWMReg.uActiveReg6    = 0;
-	ParaTable.PWMReg.uActiveReg7    = 0;
+    ParaTable.PWMReg.uActiveReg0    = SvpwmReg.T_CMPR1;
+	ParaTable.PWMReg.uActiveReg1    = SvpwmReg.T_CMPR2;
+	ParaTable.PWMReg.uActiveReg2    = SvpwmReg.T_CMPR3;
+	ParaTable.PWMReg.uActiveReg3    = RegSystem.OutVolWeRef;
+	ParaTable.PWMReg.uActiveReg4    = VVVFReg.WeReal;
+	ParaTable.PWMReg.uActiveReg5    = VVVFReg.Uref;
+	ParaTable.PWMReg.uActiveReg6    = PowerInst.UinstReg.Urms;
+	ParaTable.PWMReg.uActiveReg7    = VVVFReg.VolPI.Output;
 	ParaTable.PWMReg.uActiveReg8    = 0;
 	ParaTable.PWMReg.uActiveReg9    = 0;
 

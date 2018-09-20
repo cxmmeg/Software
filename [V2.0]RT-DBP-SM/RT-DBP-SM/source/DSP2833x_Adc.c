@@ -165,10 +165,10 @@ void ADSampleOfSOC(void)
 
 void ADSampleOfDMA(void)
 {
-    DataInst.Ia = DMABuf[0];
+    DataInst.Ia = DMABuf[0];		// 总电流
     DataInst.Ic = DMABuf[1];
 
-    DataInst.Iu = DMABuf[2];
+    DataInst.Iu = DMABuf[2];		// 负载电流
     DataInst.Iw = DMABuf[3];
 
     DataInst.Uab = DMABuf[4];

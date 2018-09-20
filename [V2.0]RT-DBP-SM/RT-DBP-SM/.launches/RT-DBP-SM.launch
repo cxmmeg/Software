@@ -5,7 +5,7 @@
 <stringAttribute key="com.ti.ccstudio.debug.debugModel.ATTR_PROGRAM.Texas Instruments XDS100v3 USB Debug Probe/C28xx" value="${build_artifact:RT-DBP-SM}"/>
 <stringAttribute key="com.ti.ccstudio.debug.debugModel.ATTR_PROJECT.Texas Instruments XDS100v3 USB Debug Probe/C28xx" value="RT-DBP-SM"/>
 <stringAttribute key="com.ti.ccstudio.debug.debugModel.ATTR_TARGET_CONFIG" value="${target_config_active_default:RT-DBP-SM}"/>
-<stringAttribute key="com.ti.ccstudio.debug.debugModel.MRU_PROGRAM.Texas Instruments XDS100v3 USB Debug Probe/C28xx" value="E:/tangkf\DSP_Soft\Soft28335\RT-DBP\[V2.0]RT-DBP-SM\RT-DBP-SM\Debug\RT-DBP-SM.out"/>
+<stringAttribute key="com.ti.ccstudio.debug.debugModel.MRU_PROGRAM.Texas Instruments XDS100v3 USB Debug Probe/C28xx" value="F:/JSCSTKF\Software\[V2.0]RT-DBP-SM\RT-DBP-SM\Debug\RT-DBP-SM.out"/>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
 <listEntry value="/RT-DBP-SM"/>
 </listAttribute>
