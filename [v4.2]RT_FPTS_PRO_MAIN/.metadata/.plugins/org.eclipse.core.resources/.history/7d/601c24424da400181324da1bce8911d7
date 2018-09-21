@@ -1,0 +1,819 @@
+/*****************头文件********************/
+#include "DSP2833x_Device.h"     
+#include "DSP2833x_Examples.h"
+
+extern struct   AD_BUFS                 DataInst;
+extern struct   AD_BUFS                 DataZero;
+extern struct   AD_BUFS                 DataBuf;
+extern struct   AD_BUFS                 DataFactor;
+extern struct   AD_BUFS                 DataFactorOrig;
+extern struct   AD_BUFS                 DataNormal;
+extern struct   AD_BUFS                 DataMax;
+extern union  	FLAG_GPIOIN   	 		FlagGpioIn;		// GPIO标志位结构体位变量
+extern union  	FLAG_SYSTEM_INITERR 	FlagSysInitErr;
+extern union  	FLAG_SYSTEM_RUNERR 		FlagSysRunErr;
+extern union  	FLAG_SYSTEM				FlagSystem;
+extern union  	FLAG_SYSTEM_ALARM		FlagSysAlarm;
+extern union  	STATE_SYSTEM			StateSystem;
+extern struct 	COUNT_SYSTEM			CountSystem;
+extern struct   PWMISR_REGS             PwmIsrReg;
+extern struct   SPLL_REGS               SpllRegNO1;
+extern struct   SPLL_REGS               SpllRegNO2;
+extern struct   SPLL_REGS               SpllRegOut;
+extern struct   SPLL_REGS               SpllRegUFO;
+extern enum   	SYSTEM_STATE 			SystemState;
+extern enum   	CONVERT_STATE 			ConvertState;
+extern struct 	CANFRAME  				CanRxPack;
+
+void SaveT4VarToPara(void);
+void SysStateLedDisplay(int16 led4_state, int16 led3_state, int16 led1_state);
+void FlagInit(void);
+void ReadT4VarFromPara(void);
+
+void InitT4Var(void)
+{
+    NOP;
+}
+
+void ReadT4VarFromPara(void)
+{
+    Uint16 i;
+    Uint16 *pDataNormal, *pDataMax, *pDataFactor;
+
+    SpllRegNO1.SpllKp           = ParaTable.PIReg.uNO1Kp;
+    SpllRegNO1.SpllKi           = ParaTable.PIReg.uNO1Ki;
+    SpllRegNO1.SpllKc           = (int32)SpllRegNO1.SpllKi * 4096 / SpllRegNO1.SpllKp;
+    SpllRegNO1.SpllPIOutMax     = ParaTable.PIReg.uNO1PIMax;
+    SpllRegNO1.SpllPIOutMin     = ParaTable.PIReg.uNO1PIMin;
+
+    SpllRegNO2.SpllKp           = ParaTable.PIReg.uNO2Kp;
+    SpllRegNO2.SpllKi           = ParaTable.PIReg.uNO2Ki;
+    SpllRegNO2.SpllKc           = (int32)SpllRegNO2.SpllKi * 4096 / SpllRegNO2.SpllKp;
+    SpllRegNO2.SpllPIOutMax     = ParaTable.PIReg.uNO2PIMax;
+    SpllRegNO2.SpllPIOutMin     = ParaTable.PIReg.uNO2PIMin;
+
+    SpllRegOut.SpllKp           = ParaTable.PIReg.uOutKp;
+    SpllRegOut.SpllKi           = ParaTable.PIReg.uOutKi;
+    SpllRegOut.SpllKc           = (int32)SpllRegOut.SpllKi * 4096 / SpllRegOut.SpllKp;
+    SpllRegOut.SpllPIOutMax     = ParaTable.PIReg.uOutPIMax;
+    SpllRegOut.SpllPIOutMin     = ParaTable.PIReg.uOutPIMin;
+
+    SpllRegUFO.SpllKp          = ParaTable.PIReg.uOutKp;
+    SpllRegUFO.SpllKi          = ParaTable.PIReg.uOutKi;
+    SpllRegUFO.SpllKc          = (int32)SpllRegUFO.SpllKi * 4096 / SpllRegUFO.SpllKp;
+    SpllRegUFO.SpllPIOutMax    = ParaTable.PIReg.uOutPIMax;
+    SpllRegUFO.SpllPIOutMin    = ParaTable.PIReg.uOutPIMin;
+
+    DataNormal.NO1Ia  = ParaTable.PowerReg.uNO1PowerCur;
+    DataNormal.NO1Ib  = ParaTable.PowerReg.uNO1PowerCur;
+    DataNormal.NO1Ic  = ParaTable.PowerReg.uNO1PowerCur;
+    DataNormal.NO1Uab = ParaTable.PowerReg.uNO1PowerVol;
+    DataNormal.NO1Ubc = ParaTable.PowerReg.uNO1PowerVol;
+    DataNormal.NO2Ia  = ParaTable.PowerReg.uNO2PowerCur;
+    DataNormal.NO2Ib  = ParaTable.PowerReg.uNO2PowerCur;
+    DataNormal.NO2Ic  = ParaTable.PowerReg.uNO2PowerCur;
+    DataNormal.NO2Uab = ParaTable.PowerReg.uNO2PowerVol;
+    DataNormal.NO2Ubc = ParaTable.PowerReg.uNO2PowerVol;
+    DataNormal.OutUab = ParaTable.PowerReg.uOutPowerVol;
+    DataNormal.OutUbc = ParaTable.PowerReg.uOutPowerVol;
+    DataNormal.TempA  = ParaTable.PowerReg.uModATemp;
+    DataNormal.TempB  = ParaTable.PowerReg.uModBTemp;
+    DataNormal.TempC  = ParaTable.PowerReg.uModCTemp;
+
+    DataMax.NO1Ia  = ParaTable.RunCtrlReg.XSMaxNO1Cur;
+    DataMax.NO1Ib  = ParaTable.RunCtrlReg.XSMaxNO1Cur;
+    DataMax.NO1Ic  = ParaTable.RunCtrlReg.XSMaxNO1Cur;
+    DataMax.NO1Uab = ParaTable.RunCtrlReg.XSMaxNO1Vol;
+    DataMax.NO1Ubc = ParaTable.RunCtrlReg.XSMaxNO1Vol;
+    DataMax.NO2Ia  = ParaTable.RunCtrlReg.XSMaxNO2Cur;
+    DataMax.NO2Ib  = ParaTable.RunCtrlReg.XSMaxNO2Cur;
+    DataMax.NO2Ic  = ParaTable.RunCtrlReg.XSMaxNO2Cur;
+    DataMax.NO2Uab = ParaTable.RunCtrlReg.XSMaxNO2Vol;
+    DataMax.NO2Ubc = ParaTable.RunCtrlReg.XSMaxNO2Vol;
+    DataMax.OutUab = ParaTable.RunCtrlReg.XSMaxOutVol;
+    DataMax.OutUbc = ParaTable.RunCtrlReg.XSMaxOutVol;
+    DataMax.TempA  = ParaTable.RunCtrlReg.XSMaxModATemp >> 1;
+    DataMax.TempB  = ParaTable.RunCtrlReg.XSMaxModBTemp >> 1;
+    DataMax.TempC  = ParaTable.RunCtrlReg.XSMaxModCTemp >> 1;
+
+    pDataNormal = (Uint16 *)&DataNormal;
+    pDataMax = (Uint16 *)&DataMax;
+    pDataFactor = (Uint16 *)&DataFactor;
+    for (i = 0; i < 16; i++, pDataNormal++, pDataMax++, pDataFactor++)
+    {
+        *pDataFactor     = ((Uint32)*pDataMax * 1024) / (*pDataNormal);     // Q10
+        if (*pDataFactor >= 8192)
+        {
+            *pDataFactor = 8192;
+        }
+    }
+}
+
+/*---------------------------------------------------------------------
+函数原型：interrupt void Timer0_ISR(void)
+函数名称：Timer0中断
+函数功能：3ms中断
+入口参数：无
+出口参数：无
+作    者：
+日    期：
+----------------------------------------------------------------------*/
+#ifdef RUNCODE
+interrupt void Timer1_ISR(void)
+{
+	DINT;
+
+	// Acknowledge this interrupt to receive more interrupts from group 1
+    PieCtrlRegs.PIEACK.all	    = M_INT13;
+    CpuTimer1Regs.TCR.bit.TIF	= 1;
+    CpuTimer1Regs.TCR.bit.TRB	= 1;
+
+	//save data from the PWM;
+    ReadT4VarFromPara();  				// 读取参数表中的数据
+    if(0 == FlagSystem.bit.EmDataFlashWriteOK)
+    {
+    	FlagSystem.bit.EmDataFlashWriteOK = EmDataWriteToFlash();
+    }
+  	EINT;
+
+	/**********************测试程序*********************/
+#ifdef TESTCODE
+
+	SCIBRcvDeal();
+	SaveT4VarToPara();
+
+	GpioTest();
+
+#endif
+	/**********************end*********************/
+
+	/**********************项目程序*********************/
+
+/*******************************用户主程序**********************************/
+	GpioRead();
+
+	CanDataRecv();
+	CanDataSave();
+
+	SCIBRcvDeal();
+	SCICRcvDeal();
+	SaveT4VarToPara();
+
+	// 报警灯控制
+	if (FlagSysAlarm.all != 0)							// 系统报警状态显示
+	{
+		ControlGPIOOut(GPIO_LED6, ALARM_LED_ON);
+	}
+	else
+	{
+		ControlGPIOOut(GPIO_LED6, ALARM_LED_OFF);
+	}
+
+	// 冗余DSP状态给定
+	if ((1 == StateSystem.bit.NO1Active) && (0 == StateSystem.bit.NO2Active))
+	{
+		ControlGPIOOut(D02, ON);
+		ControlGPIOOut(D03, OFF);
+	}
+	else if ((0 == StateSystem.bit.NO1Active) && (1 == StateSystem.bit.NO2Active))
+	{
+		ControlGPIOOut(D02, OFF);
+		ControlGPIOOut(D03, ON);
+	}
+	else
+	{
+		ControlGPIOOut(D02, OFF);
+		ControlGPIOOut(D03, OFF);
+	}
+
+	/*------------------------状态向量表运行--------------------------*/
+	switch (SystemState)
+	{
+		case SystemWait:								// 系统初始化自检
+			{
+				SysStateLedDisplay(STANDBY_LED_OFF, RUN_LED_OFF, FAULT_LED_OFF);
+				CtrlSCRDisable(ALL_CHANNEL);
+				DisablePWM(1);
+				if (FlagSysInitErr.all != 0)	// 判断系统初始化是否有故障
+				{
+					SystemState = SystemFault;
+				}
+				else
+				{
+					CountSystem.FaultReset = 0;
+					CountSystem.DelaySysWait++;
+					if (CountSystem.DelaySysWait >= 1000)	// 延迟3秒
+					{
+						CountSystem.DelaySysWait = 1000;
+						SystemState = SystemStandby;
+					}
+				}
+				break;
+			}
+
+		case SystemStandby:
+			{
+				SysStateLedDisplay(STANDBY_LED_ON, RUN_LED_OFF, FAULT_LED_OFF);
+				CtrlSCRDisable(ALL_CHANNEL);
+				FlagInit();
+				CanDataDealInIdlesse();			// 系统待机状态下，允许通过CAN命令设置主备电优先级
+				XintIORelease();
+
+				EALLOW;
+			   	EPwm1Regs.TZCLR.all = 0x07;
+			    EPwm2Regs.TZCLR.all = 0x07;
+			    EPwm3Regs.TZCLR.all = 0x07;
+				EPwm4Regs.TZCLR.all = 0x07;
+			    EPwm5Regs.TZCLR.all = 0x07;
+			    EPwm6Regs.TZCLR.all = 0x07;
+				EDIS;
+
+				InVolProtect();
+				TempProtect();
+				SCRProtect();
+
+				if (FlagSysRunErr.all != 0)
+				{
+					SystemState = SystemFault;
+				}
+				else if (1 == FlagSystem.bit.RmtMode)
+				{
+					if ((1 == FlagSystem.bit.RmtStart) && (0 == FlagSystem.bit.XintIOCatch)
+					&& (1 == SpllRegNO1.SpllOk) && (1 == SpllRegNO2.SpllOk))
+					{
+						SystemState = SystemRun;
+						InitT4Var();
+					   	EnablePWM(1);
+					}
+				}
+				else if (0 == FlagSystem.bit.RmtMode)
+				{
+					if ((1 == FLAG_RUN_CMD) && (0 == FlagSystem.bit.XintIOCatch))
+//					&& (1 == SpllRegNO1.SpllOk) && (1 == SpllRegNO2.SpllOk))
+					{
+						SystemState = SystemRun;
+						InitT4Var();
+						EnablePWM(1);
+					}
+				}
+				break;
+			}
+		case SystemRun:								// 系统正常运行
+			{
+				SysStateLedDisplay(STANDBY_LED_OFF, RUN_LED_ON, FAULT_LED_OFF);
+				CanDataDealInRun();
+			   	EnablePWM(1);
+
+				if (1 == FlagSystem.bit.RmtMode)
+				{
+					if (0 == FlagSystem.bit.RmtStart)
+					{
+						SystemState = SystemStandby;
+						DisablePWM(1);
+						FlagSystem.bit.XintIOCatch = 0;
+						StateSystem.bit.SoftStartSuccess = 0;
+					}
+				}
+				else if (0 == FlagSystem.bit.RmtMode)
+				{
+					if (1 == FLAG_STOP_CMD)
+					{
+						SystemState = SystemStandby;
+						DisablePWM(1);
+						FlagSystem.bit.XintIOCatch = 0;
+						StateSystem.bit.SoftStartSuccess = 0;
+					}
+				}
+
+				if ((0 == StateSystem.bit.SoftStartSuccess) && (1 == FlagSystem.bit.SoftStart))				// 电机软启动过程
+				{
+					NOP;
+				}
+				else
+				{
+					ForceModeChosen();					// 切换模式选择-强制切换
+					if (0 == FlagSystem.bit.ForceModeOn)
+					{
+						DelayModeChosen();				// 切换模式选择-延迟切换
+					}
+					switch (ConvertState)
+					{
+						case ConvertInit:
+						{
+							if (1 == FlagSystem.bit.NO1Preferred)
+							{
+								CtrlSCREnable(NO1_CHANNEL);
+								StateSystem.bit.NO1Active = 1;
+								StateSystem.bit.NO2Active = 0;
+							}
+							if (1 == FlagSystem.bit.NO2Preferred)
+							{
+								CtrlSCREnable(NO2_CHANNEL);
+								StateSystem.bit.NO1Active = 0;
+								StateSystem.bit.NO2Active = 1;
+							}
+							break;
+						}
+						case ConvertForce:
+						{
+							if (1 == FlagSystem.bit.NO1Preferred)
+							{
+								if (StateSystem.bit.NO1Active == 1)
+								{
+									FlagSystem.bit.ChgNo1ToNo2 = 1;
+								}
+							}
+							if (1 == FlagSystem.bit.NO2Preferred)
+							{
+								if (StateSystem.bit.NO2Active == 1)
+								{
+									FlagSystem.bit.ChgNo2ToNo1 = 1;
+								}
+							}
+							break;
+						}
+						case ConvertDelay:
+						{
+							if (1 == FlagSystem.bit.NO1Preferred)
+							{
+								if (StateSystem.bit.NO1Active == 1)
+								{
+									FlagSystem.bit.ChgNo1ToNo2 = 1;
+								}
+							}
+							if (1 == FlagSystem.bit.NO2Preferred)
+							{
+								if (StateSystem.bit.NO2Active == 1)
+								{
+									FlagSystem.bit.ChgNo2ToNo1 = 1;
+								}
+							}
+							break;
+						}
+						case ConvertReset:
+						{
+							if (1 == FlagSystem.bit.NO1Preferred)
+							{
+								if (StateSystem.bit.NO2Active == 1)
+								{
+									FlagSystem.bit.ChgNo2ToNo1 = 1;
+								}
+							}
+							if (1 == FlagSystem.bit.NO2Preferred)
+							{
+								if (StateSystem.bit.NO1Active == 1)
+								{
+									FlagSystem.bit.ChgNo1ToNo2 = 1;
+								}
+							}
+							break;
+						}
+						default:
+							break;
+					}
+				}
+
+				//----- 保护代码 ------//
+				// 保护子函数
+				InVolProtect();
+				InCurProtect();
+				SCRProtect();
+				TempProtect();
+
+				if (FlagSysRunErr.all != 0)
+				{
+					SystemState = SystemFault;
+				}
+
+				//---------------------//
+				break;
+			}
+		case SystemFault:								// 故障处理
+			{
+				CtrlSCRDisable(ALL_CHANNEL);
+				DisablePWM(1);
+				StateSystem.bit.NO1Active = 0;
+				StateSystem.bit.NO2Active = 0;
+				SysStateLedDisplay(STANDBY_LED_OFF, RUN_LED_OFF, FAULT_LED_ON);
+
+				if(FlagSysRunErr.all != 0)
+				{
+					TempProtect();
+					PDPClearFunc(1666);                 // 硬件故障，等待5秒强制清空
+
+					if (1 == FLAG_STOP_CMD)
+					{
+						CountSystem.FaultReset++;			// 等待3s,强制清空故障
+						if (CountSystem.FaultReset > 1000)
+						{
+							CountSystem.FaultReset = 1000;
+							FlagSysRunErr.all = 0;
+							FlagSysAlarm.all = 0;
+						}
+					}
+				}
+				else
+				{
+					SystemState = SystemWait;
+				}
+
+				break;
+			}
+	}
+
+#endif
+
+	CountSystem.T4Cycle = (CpuTimer1Regs.PRD.all - CpuTimer1Regs.TIM.all) * 0.0066;			// us
+}
+
+interrupt void Timer1_ISR(void)
+{
+    DINT;
+
+    // Acknowledge this interrupt to receive more interrupts from group 1
+    PieCtrlRegs.PIEACK.all      = M_INT13;
+    CpuTimer1Regs.TCR.bit.TIF   = 1;
+    CpuTimer1Regs.TCR.bit.TRB   = 1;
+
+    //save data from the PWM;
+    ReadT4VarFromPara();                // 读取参数表中的数据
+    if(0 == FlagSystem.bit.EmDataFlashWriteOK)
+    {
+        FlagSystem.bit.EmDataFlashWriteOK = EmDataWriteToFlash();
+    }
+    EINT;
+
+    /**********************测试程序*********************/
+#ifdef TESTCODE
+
+    SCIBRcvDeal();
+    SaveT4VarToPara();
+
+    GpioTest();
+
+#endif
+    /**********************end*********************/
+
+    /**********************项目程序*********************/
+#ifdef RUNCODE
+/*******************************用户主程序**********************************/
+    GpioRead();
+
+    CanDataRecv();
+    CanDataSave();
+
+    SCIBRcvDeal();
+    SCICRcvDeal();
+    SaveT4VarToPara();
+
+    // 报警灯控制
+    if (FlagSysAlarm.all != 0)                          // 系统报警状态显示
+    {
+        ControlGPIOOut(GPIO_LED6, ALARM_LED_ON);
+    }
+    else
+    {
+        ControlGPIOOut(GPIO_LED6, ALARM_LED_OFF);
+    }
+
+    // 冗余DSP状态给定
+    if ((1 == StateSystem.bit.NO1Active) && (0 == StateSystem.bit.NO2Active))
+    {
+        ControlGPIOOut(D02, ON);
+        ControlGPIOOut(D03, OFF);
+    }
+    else if ((0 == StateSystem.bit.NO1Active) && (1 == StateSystem.bit.NO2Active))
+    {
+        ControlGPIOOut(D02, OFF);
+        ControlGPIOOut(D03, ON);
+    }
+    else
+    {
+        ControlGPIOOut(D02, OFF);
+        ControlGPIOOut(D03, OFF);
+    }
+
+    /*------------------------状态向量表运行--------------------------*/
+    switch (SystemState)
+    {
+        case SystemWait:                                // 系统初始化自检
+            {
+                SysStateLedDisplay(STANDBY_LED_OFF, RUN_LED_OFF, FAULT_LED_OFF);
+                CtrlSCRDisable(ALL_CHANNEL);
+                DisablePWM(1);
+                if (FlagSysInitErr.all != 0)    // 判断系统初始化是否有故障
+                {
+                    SystemState = SystemFault;
+                }
+                else
+                {
+                    CountSystem.FaultReset = 0;
+                    CountSystem.DelaySysWait++;
+                    if (CountSystem.DelaySysWait >= 1000)   // 延迟3秒
+                    {
+                        CountSystem.DelaySysWait = 1000;
+                        SystemState = SystemStandby;
+                    }
+                }
+                break;
+            }
+
+        case SystemStandby:
+            {
+                SysStateLedDisplay(STANDBY_LED_ON, RUN_LED_OFF, FAULT_LED_OFF);
+                CtrlSCRDisable(ALL_CHANNEL);
+                FlagInit();
+                CanDataDealInIdlesse();         // 系统待机状态下，允许通过CAN命令设置主备电优先级
+                XintIORelease();
+
+                EALLOW;
+                EPwm1Regs.TZCLR.all = 0x07;
+                EPwm2Regs.TZCLR.all = 0x07;
+                EPwm3Regs.TZCLR.all = 0x07;
+                EPwm4Regs.TZCLR.all = 0x07;
+                EPwm5Regs.TZCLR.all = 0x07;
+                EPwm6Regs.TZCLR.all = 0x07;
+                EDIS;
+
+                InVolProtect();
+                TempProtect();
+                SCRProtect();
+
+                if (FlagSysRunErr.all != 0)
+                {
+                    SystemState = SystemFault;
+                }
+                else if (1 == FlagSystem.bit.RmtMode)
+                {
+                    if ((1 == FlagSystem.bit.RmtStart) && (0 == FlagSystem.bit.XintIOCatch)
+                    && (1 == SpllRegNO1.SpllOk) && (1 == SpllRegNO2.SpllOk))
+                    {
+                        SystemState = SystemRun;
+                        InitT4Var();
+                        EnablePWM(1);
+                    }
+                }
+                else if (0 == FlagSystem.bit.RmtMode)
+                {
+                    if ((1 == FLAG_RUN_CMD) && (0 == FlagSystem.bit.XintIOCatch))
+//                  && (1 == SpllRegNO1.SpllOk) && (1 == SpllRegNO2.SpllOk))
+                    {
+                        SystemState = SystemRun;
+                        InitT4Var();
+                        EnablePWM(1);
+                    }
+                }
+                break;
+            }
+        case SystemRun:                             // 系统正常运行
+            {
+                SysStateLedDisplay(STANDBY_LED_OFF, RUN_LED_ON, FAULT_LED_OFF);
+                CanDataDealInRun();
+                EnablePWM(1);
+
+                if (1 == FlagSystem.bit.RmtMode)
+                {
+                    if (0 == FlagSystem.bit.RmtStart)
+                    {
+                        SystemState = SystemStandby;
+                        DisablePWM(1);
+                        FlagSystem.bit.XintIOCatch = 0;
+                        StateSystem.bit.SoftStartSuccess = 0;
+                    }
+                }
+                else if (0 == FlagSystem.bit.RmtMode)
+                {
+                    if (1 == FLAG_STOP_CMD)
+                    {
+                        SystemState = SystemStandby;
+                        DisablePWM(1);
+                        FlagSystem.bit.XintIOCatch = 0;
+                        StateSystem.bit.SoftStartSuccess = 0;
+                    }
+                }
+
+                if ((0 == StateSystem.bit.SoftStartSuccess) && (1 == FlagSystem.bit.SoftStart))             // 电机软启动过程
+                {
+                    NOP;
+                }
+                else
+                {
+                    ForceModeChosen();                  // 切换模式选择-强制切换
+                    if (0 == FlagSystem.bit.ForceModeOn)
+                    {
+                        DelayModeChosen();              // 切换模式选择-延迟切换
+                    }
+                    switch (ConvertState)
+                    {
+                        case ConvertInit:
+                        {
+                            if (1 == FlagSystem.bit.NO1Preferred)
+                            {
+                                CtrlSCREnable(NO1_CHANNEL);
+                                StateSystem.bit.NO1Active = 1;
+                                StateSystem.bit.NO2Active = 0;
+                            }
+                            if (1 == FlagSystem.bit.NO2Preferred)
+                            {
+                                CtrlSCREnable(NO2_CHANNEL);
+                                StateSystem.bit.NO1Active = 0;
+                                StateSystem.bit.NO2Active = 1;
+                            }
+                            break;
+                        }
+                        case ConvertForce:
+                        {
+                            if (1 == FlagSystem.bit.NO1Preferred)
+                            {
+                                if (StateSystem.bit.NO1Active == 1)
+                                {
+                                    FlagSystem.bit.ChgNo1ToNo2 = 1;
+                                }
+                            }
+                            if (1 == FlagSystem.bit.NO2Preferred)
+                            {
+                                if (StateSystem.bit.NO2Active == 1)
+                                {
+                                    FlagSystem.bit.ChgNo2ToNo1 = 1;
+                                }
+                            }
+                            break;
+                        }
+                        case ConvertDelay:
+                        {
+                            if (1 == FlagSystem.bit.NO1Preferred)
+                            {
+                                if (StateSystem.bit.NO1Active == 1)
+                                {
+                                    FlagSystem.bit.ChgNo1ToNo2 = 1;
+                                }
+                            }
+                            if (1 == FlagSystem.bit.NO2Preferred)
+                            {
+                                if (StateSystem.bit.NO2Active == 1)
+                                {
+                                    FlagSystem.bit.ChgNo2ToNo1 = 1;
+                                }
+                            }
+                            break;
+                        }
+                        case ConvertReset:
+                        {
+                            if (1 == FlagSystem.bit.NO1Preferred)
+                            {
+                                if (StateSystem.bit.NO2Active == 1)
+                                {
+                                    FlagSystem.bit.ChgNo2ToNo1 = 1;
+                                }
+                            }
+                            if (1 == FlagSystem.bit.NO2Preferred)
+                            {
+                                if (StateSystem.bit.NO1Active == 1)
+                                {
+                                    FlagSystem.bit.ChgNo1ToNo2 = 1;
+                                }
+                            }
+                            break;
+                        }
+                        default:
+                            break;
+                    }
+                }
+
+                //----- 保护代码 ------//
+                // 保护子函数
+                InVolProtect();
+                InCurProtect();
+                SCRProtect();
+                TempProtect();
+
+                if (FlagSysRunErr.all != 0)
+                {
+                    SystemState = SystemFault;
+                }
+
+                //---------------------//
+                break;
+            }
+        case SystemFault:                               // 故障处理
+            {
+                CtrlSCRDisable(ALL_CHANNEL);
+                DisablePWM(1);
+                StateSystem.bit.NO1Active = 0;
+                StateSystem.bit.NO2Active = 0;
+                SysStateLedDisplay(STANDBY_LED_OFF, RUN_LED_OFF, FAULT_LED_ON);
+
+                if(FlagSysRunErr.all != 0)
+                {
+                    TempProtect();
+                    PDPClearFunc(1666);                 // 硬件故障，等待5秒强制清空
+
+                    if (1 == FLAG_STOP_CMD)
+                    {
+                        CountSystem.FaultReset++;           // 等待3s,强制清空故障
+                        if (CountSystem.FaultReset > 1000)
+                        {
+                            CountSystem.FaultReset = 1000;
+                            FlagSysRunErr.all = 0;
+                            FlagSysAlarm.all = 0;
+                        }
+                    }
+                }
+                else
+                {
+                    SystemState = SystemWait;
+                }
+
+                break;
+            }
+    }
+
+#endif
+
+    CountSystem.T4Cycle = (CpuTimer1Regs.PRD.all - CpuTimer1Regs.TIM.all) * 0.0066;         // us
+}
+
+
+void SysStateLedDisplay(int16 led3_state, int16 led4_state, int16 led5_state)
+{
+	ControlGPIOOut(GPIO_LED3, led3_state);		// 系统STAND BY状态指示
+	ControlGPIOOut(GPIO_LED4, led4_state);		// 系统SYSTEM_RUN状态指示
+	ControlGPIOOut(GPIO_LED5, led5_state);		// 系统SYSTEM_FAULT状态指示
+}
+
+void FlagInit(void)
+{
+	ConvertState 						= ConvertInit;
+
+	FlagSystem.bit.ChgNo1ToNo2			= 0;
+	FlagSystem.bit.ChgNo2ToNo1			= 0;
+	FlagSystem.bit.ABChannelOn			= 0;
+	FlagSystem.bit.AllchannelOn			= 0;
+	FlagSystem.bit.SoftDataSave			= 0;
+
+	FlagSysAlarm.bit.OutSPLLAlarm		= 0;
+	FlagSysAlarm.bit.FroceModeAlarm 	= 0;
+	FlagSysAlarm.bit.NO1InCurHighAlarm	= 0;
+	FlagSysAlarm.bit.NO2InCurHighAlarm	= 0;
+
+	FlagSysRunErr.bit.NO1InCurHighCut	= 0;
+	FlagSysRunErr.bit.NO2InCurHighCut	= 0;
+
+	StateSystem.bit.NO1Ready			= 0;
+	StateSystem.bit.NO2Ready			= 0;
+	StateSystem.bit.SoftStartSuccess	= 0;
+	StateSystem.bit.NO1Active			= 0;
+	StateSystem.bit.NO2Active			= 0;
+
+	CountSystem.ForceChangeDelay		= 0;
+	CountSystem.ForceChangeTime			= 0;
+	CountSystem.SoftStartDelay			= 0;
+	CountSystem.SoftStartAlpha			= 0;
+	CountSystem.SoftStart				= 0;
+	CountSystem.NO1ZeroCrossDelay		= 0;
+	CountSystem.NO2ZeroCrossDelay		= 0;
+	CountSystem.DelayProtectNO1			= 0;
+	CountSystem.DelayProtectNO2			= 0;
+}
+
+void SaveT4VarToPara(void)
+{
+	static int16 i = 0;
+
+	ParaTable.Timer1Reg.uSystemStatus 	= SystemState;
+	ParaTable.Timer1Reg.uSystemInitErr	= FlagSysInitErr.all;
+	ParaTable.Timer1Reg.uSystemRunErr 	= FlagSysRunErr.all;
+	ParaTable.Timer1Reg.uSystemAlarmH	= FlagSysAlarm.all >> 16;
+	ParaTable.Timer1Reg.uSystemAlarmL	= FlagSysAlarm.all & 0x0000ffff;
+	ParaTable.Timer1Reg.uGpioIn			= FlagGpioIn.all;
+    ParaTable.Timer1Reg.uNO1RunStatus 	= StateSystem.bit.NO1Active;
+    ParaTable.Timer1Reg.uNO2RunStatus 	= StateSystem.bit.NO2Active;
+    ParaTable.Timer1Reg.uNO1Preferred 	= FlagSystem.bit.NO1Preferred;
+    ParaTable.Timer1Reg.uNO2Preferred 	= FlagSystem.bit.NO2Preferred;
+
+    ParaTable.Timer1Reg.uNO1VolRms    	= ((Uint32)PwmIsrReg.NO1URms * ParaTable.PowerReg.uNO1PowerVol) >> 12;
+    ParaTable.Timer1Reg.uNO1CurRms    	= ((Uint32)PwmIsrReg.NO1IRms * ParaTable.PowerReg.uNO1PowerCur) >> 12;
+    ParaTable.Timer1Reg.uNO1Fre    		= ((Uint32)SpllRegNO1.SpllWe * ParaTable.PowerReg.uNO1PowerFre) >> 10;
+
+    ParaTable.Timer1Reg.uNO2VolRms    	= ((Uint32)PwmIsrReg.NO2URms * ParaTable.PowerReg.uNO2PowerVol) >> 12;
+	ParaTable.Timer1Reg.uNO2CurRms    	= ((Uint32)PwmIsrReg.NO2IRms * ParaTable.PowerReg.uNO2PowerCur) >> 12;
+	ParaTable.Timer1Reg.uNO2Fre    		= ((Uint32)SpllRegNO2.SpllWe * ParaTable.PowerReg.uNO2PowerFre) >> 10;
+
+	ParaTable.Timer1Reg.uOutVolRms      = ((Uint32)PwmIsrReg.OutURms * ParaTable.PowerReg.uOutPowerVol) >> 12;
+    ParaTable.Timer1Reg.uOutFre         = ((Uint32)SpllRegOut.SpllWe * ParaTable.PowerReg.uOutPowerFre) >> 10;
+
+	ParaTable.Timer1Reg.uT4UseTime		= CountSystem.T4Cycle;
+	ParaTable.Timer1Reg.uSpOrMainDSPFre	= PwmIsrReg.SpOrMainDSPFre;
+	ParaTable.Timer1Reg.uModATemp	    = (((Uint32)PwmIsrReg.TempARms * ParaTable.PowerReg.uModATemp) >> 12) * 1.2 - 250;       // 斜率K=521，b=-250
+	ParaTable.Timer1Reg.uModBTemp	    = (((Uint32)PwmIsrReg.TempBRms * ParaTable.PowerReg.uModBTemp) >> 12) * 1.2 - 250;
+	ParaTable.Timer1Reg.uModCTemp	    = (((Uint32)PwmIsrReg.TempCRms * ParaTable.PowerReg.uModCTemp) >> 12) * 1.2 - 250;
+	ParaTable.Timer1Reg.uInstReg1		= 0;
+	ParaTable.Timer1Reg.uInstReg2		= 0;
+	ParaTable.Timer1Reg.uInstReg3		= 0;
+	ParaTable.Timer1Reg.uInstReg4		= 0;
+	ParaTable.Timer1Reg.uInstReg5		= 0;
+	ParaTable.Timer1Reg.uInstReg6		= 0;
+	ParaTable.Timer1Reg.uInstReg7		= 0;
+	ParaTable.Timer1Reg.uInstReg8		= 0;
+	ParaTable.Timer1Reg.uInstReg9		= 0;
+}

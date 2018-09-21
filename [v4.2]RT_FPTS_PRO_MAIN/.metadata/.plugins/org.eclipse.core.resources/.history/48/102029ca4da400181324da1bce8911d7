@@ -1,0 +1,519 @@
+#ifndef	_USERS_PARA_TAB_H_
+#define	_USERS_PARA_TAB_H_
+
+//#define TESTCODE	1				// 运行测试程序把此开关打开
+#define RUNCODE		2				// 运行项目程序把此开关打开
+
+#define 250A_EQUIPMENT   3
+#define 400A_EQUIPMENT
+
+#define ON							0
+#define OFF 						1
+#define STANDBY_LED_ON				0
+#define STANDBY_LED_OFF				1
+#define RUN_LED_ON					0
+#define RUN_LED_OFF					1
+#define FAULT_LED_ON				0
+#define FAULT_LED_OFF				1
+#define ALARM_LED_ON				0
+#define ALARM_LED_OFF				1
+
+#define LPF_K1						3
+#define	LPF_K2						2
+
+#define FLAG_SYS_OVERTEMP			FlagGpioIn.bit.GpioIn1
+#define FLAG_SOFT_START				FlagGpioIn.bit.GpioIn2
+#define FLAG_RUN_CMD				FlagGpioIn.bit.GpioIn3
+#define FLAG_STOP_CMD				FlagGpioIn.bit.GpioIn4
+#define FLAG_PREFFERED				FlagGpioIn.bit.GpioIn5
+#define FLAG_FORCE_CHANGE			FlagGpioIn.bit.GpioIn6
+#define FLAG_RSVD1					FlagGpioIn.bit.GpioIn7
+#define FLAG_RSVD2		            FlagGpioIn.bit.GpioIn8
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/*-------------------------系统参数表定义----------------------------
+*   包含：系统参数表定义
+*   说明：每组数据固定64个寄存器
+*
+*-------------------------系统参数表定义----------------------------*/
+
+//------------------------------------------------------------
+// 系统状态表定义
+
+//------------------------------------------------------------
+enum SYSTEM_STATE {
+	SystemWait,
+	SystemStandby,
+	SystemRun,
+	SystemFault
+};
+
+enum CONVERT_STATE {
+	ConvertInit,
+	ConvertForce,
+	ConvertDelay,
+	ConvertReset
+};
+
+//------------------------------------------------------------
+// 系统初始化异常标记位
+
+//------------------------------------------------------------
+struct	FLAG_SYSTEM_INITERR_BITS{				// 位定义	0为正常	1为异常
+	Uint16 GPIOInitErr 			: 1;			// 0	通用IO口初始化异常位
+	Uint16 SCRInitErr 			: 1;			// 1	SCR端口初始化异常位
+	Uint16 SCIBInitErr			: 1;			// 2	SCIB口初始化异常位
+	Uint16 PWM1InitErr			: 1;			// 3	PWM1外设初始化异常位
+	Uint16 Time1InitErr			: 1;			// 4	定时器1外设初始化异常位
+	Uint16 Time2InitErr			: 1;			// 5	定时器1外设初始化异常位
+	Uint16 CanBInitErr			: 1;			// 6	CANB外设初始化异常位
+	Uint16 ADCInitErr			: 1;			// 7	ADC外设初始化异常位
+	Uint16 EXRAMInitErr			: 1;			// 8	外部RAM初始化异常位
+	Uint16 DMAInitErr			: 1;			// 9	DMA初始化异常位
+	Uint16 SCICInitErr			: 1;			// 10	SCIC口初始化异常位
+	Uint16 rsvd1				: 5;			// 11-15
+};
+
+union   FLAG_SYSTEM_INITERR{
+	Uint16 all;
+	struct FLAG_SYSTEM_INITERR_BITS bit;
+};
+
+//------------------------------------------------------------
+// 系统运行异常标记位
+
+//------------------------------------------------------------
+struct	FLAG_SYSTEM_RUNERR_BITS{			// 位定义	0为正常	1为异常
+	Uint16 NO1ASCRBroken		: 1;		// 0	第一路SCR,A相断路
+	Uint16 NO1BSCRBroken		: 1;		// 1	第一路SCR,B相断路
+	Uint16 NO1CSCRBroken		: 1;		// 2	第一路SCR,C相断路
+	Uint16 NO2ASCRBroken		: 1;		// 3	第二路SCR,A相断路
+	Uint16 NO2BSCRBroken		: 1;		// 4	第二路SCR,B相断路
+	Uint16 NO2CSCRBroken		: 1;		// 5	第二路SCR,C相断路
+	Uint16 NO1InCurHighCut		: 1;		// 6	第一路过流保护
+	Uint16 NO2InCurHighCut		: 1;		// 7	第二路过流保护
+	Uint16 OverTempCut			: 1;		// 8	系统过温保护
+	Uint16 FlagPDP				: 1;		// 9	PDP硬件保护
+	Uint16 rsvd1				: 6;		// 10-15备用
+};
+
+struct  FLAG_SYSTEM_ALARM_BITS{				// 位定义	0为正常	1为异常
+	Uint32 NO1ASCRShort			: 1;		// 0	第一路SCR,A相短路
+	Uint32 NO1BSCRShort			: 1;		// 1	第一路SCR,B相短路
+	Uint32 NO1CSCRShort			: 1;		// 2	第一路SCR,C相短路
+	Uint32 NO2ASCRShort			: 1;		// 3	第二路SCR,A相短路
+	Uint32 NO2BSCRShort			: 1;		// 4	第二路SCR,B相短路
+	Uint32 NO2CSCRShort			: 1;		// 5	第二路SCR,C相短路
+	Uint32 NO1InVolLowAlarm		: 1;		// 6	第一路输入低压报警
+	Uint32 NO1InVolHighAlarm	: 1;		// 7	第一路输入高压报警
+	Uint32 NO2InVolLowAlarm		: 1;		// 8	第二路输入低压报警
+	Uint32 NO2InVolHighAlarm	: 1;		// 9	第二路输入高压报警
+	Uint32 NO1InCurHighAlarm	: 1;		// 10	第一路过流报警
+	Uint32 NO2InCurHighAlarm	: 1;		// 11	第二路过流报警
+	Uint32 CanSendAlarm			: 1;		// 12	CAN发送失败报警
+	Uint32 NO1SPLLAlarm			: 1;		// 13	第一路主电锁相失败报警
+	Uint32 NO2SPLLAlarm			: 1;		// 14	第二路主电锁相失败报警
+	Uint32 Default0             : 1;        // 15      默认写0
+
+	Uint32 OutSPLLAlarm			: 1;		// 16	输出锁相失败报警
+	Uint32 FroceModeAlarm		: 1;		// 17	手动强制切换报警，提醒用户切回主路
+	Uint32 OverTempAlarm        : 1;        // 18      系统过温报警
+	Uint32 rsvd1				: 12;		// 19-31备用
+};
+
+union   FLAG_SYSTEM_RUNERR{
+	Uint16 all;
+	struct FLAG_SYSTEM_RUNERR_BITS bit;
+};
+
+union	FLAG_SYSTEM_ALARM{
+	Uint32 all;
+	struct FLAG_SYSTEM_ALARM_BITS bit;
+};
+
+//------------------------------------------------------------
+// 产品参数表
+
+//------------------------------------------------------------
+//电源常规参数组 64
+struct FPTS_POWER_REG
+{
+	int16		uNO1PowerType;      // 第一路电源类型
+    int16		uNO1PowerFre;       // 第一路电源额定频率  实际值，缺省500   0.1HZ（单位）
+	int16		uNO1PowerVol;       // 第一路电源额定电压  实际值，缺省3800  0.1V （单位）
+	int16		uNO1PowerCur;       // 第一路电源额定电流  实际值，缺省1000  0.1A （单位）
+	int16		uNO2PowerType;      // 第二路电源类型
+    int16		uNO2PowerFre;       // 第二路电源额定频率  实际值，缺省500   0.1HZ（单位）
+	int16		uNO2PowerVol;       // 第二路电源额定电压  实际值，缺省3800  0.1V （单位）
+	int16		uNO2PowerCur;       // 第二路电源额定电流  实际值，缺省1000  0.1A （单位）
+	int16		uOutPowerType;      // 输出电源类型
+    int16		uOutPowerFre;       // 输出电源额定频率  实际值，缺省500   0.1HZ（单位）
+
+	int16		uOutPowerVol;       // 输出电源额定电压  实际值，缺省3800  0.1V （单位）
+	int16		uOutPowerCur;       // 输出电源额定电流  实际值，缺省1000  0.1A （单位）
+	int16		uModATemp;		    // A相正常温度值，缺省250，单位0.1℃
+	int16		uModBTemp;		    // B相正常温度值，缺省250，单位0.1℃
+	int16		uModCTemp;		    // C相正常温度值，缺省250，单位0.1℃
+	int16		uHardwareVer;		// 硬件版本号，例硬件版本为V4.2，该值显示42
+	int16		uParaTableVer;	 	// 参数表版本号，按修改次数累加，如为0，则判断为需要初始化
+    int16       uSoftwareVer;       // 软件版本号                例软件版本为V18041，该值表示18年4月份第1次修改
+
+   	int16		nRrsev[46];
+};
+
+//PI参数设置组 64
+struct  FPTS_PI_REG
+{
+	int16   	uNO1Kp;             // 第一路电压锁相环
+	int16   	uNO1Ki;
+    int16  		uNO1Kd;
+	int16 		uNO1PIMax;
+	int16 		uNO1PIMin;
+	int16   	uNO2Kp;             // 第二路电压锁相环
+	int16   	uNO2Ki;
+    int16  		uNO2Kd;
+	int16 		uNO2PIMax;
+	int16 		uNO2PIMin;
+
+	int16   	uOutKp;             // 输出电压锁相环
+	int16   	uOutKi;
+    int16  		uOutKd;
+	int16 		uOutPIMax;
+	int16 		uOutPIMin;
+
+   	int16     	nRrsev[49];       	//预留；
+};
+
+// 运行控制参数组 64
+struct FPTS_RUN_CTRL_REG
+{
+	int16		uNO1VolUpper;		// 第一路电源过压保护值： 标幺值；4096=100%  Q12
+	int16		uNO1VolLower;		// 第一路电源欠压保护值： 标幺值；4096=100%  Q12
+	int16		uNO1CurAlarm;		// 第一路电源过流报警值： 标幺值；4096=100%  Q12
+	int16		uNO1CurCut;			// 第一路电源过流切断值： 标幺值；4096=100%  Q12
+	int16		uNO1VolUpDelay;		// 第一路电源过压保护延迟报警值	 @3ms
+	int16		uNO1VolLowDelay;	// 第一路电源欠压保护延迟报警值	 @3ms
+	int16		uNO1CurAlarmDelay;	// 第一路电源过流保护延迟报警值	 @3ms
+	int16		uNO1CurCutDelay;	// 第一路电源过流保护延迟切断值	 @3ms
+	int16		uNO2VolUpper;		// 第二路电源过压保护值： 标幺值；4096=100%  Q12
+	int16		uNO2VolLower;		// 第二路电源欠压保护值： 标幺值；4096=100%  Q12
+
+	int16		uNO2CurAlarm;		// 第二路电源过流报警值： 标幺值；4096=100%  Q12
+	int16		uNO2CurCut;			// 第二路电源过流切断值： 标幺值；4096=100%  Q12
+	int16		uNO2VolUpDelay;		// 第一路电源过压保护延迟报警值	 @3ms
+	int16		uNO2VolLowDelay;	// 第一路电源欠压保护延迟报警值	 @3ms
+	int16		uNO2CurAlarmDelay;	// 第一路电源过流保护延迟报警值	 @3ms
+	int16		uNO2CurCutDelay;	// 第一路电源过流保护延迟切断值	 @3ms
+	int16       uFanOpenTemp;       // 风扇开启温度         实际值；单位0.1℃
+	int16       uTempAlarm;         // 过温告警值            实际值；单位0.1℃
+	int16       uTempCut;           // 过温切断值            实际值；单位0.1℃
+    int16     	XSMaxNO1Vol;     	// 第一路电源输入电压满量程值
+
+	int16     	XSMaxNO2Vol;     	// 第二路电源输入电压满量程值
+    int16     	XSMaxOutVol;		// 输出电压满量程值
+    int16 		XSMaxNO1Cur;		// 第一路电源电流满量程值
+    int16 		XSMaxNO2Cur;		// 第二路电源电流满量程值
+    int16		XSMaxModATemp;		// A相模块温度满量程值
+    int16		XSMaxModBTemp;		// B相模块温度满量程值
+    int16		XSMaxModCTemp;		// C相模块温度满量程值
+
+ 	int16     	nRrsev[37];			// 预留
+};
+
+
+//------------------------------------------------------------
+// 传感器系数控制参数组 64
+
+//------------------------------------------------------------
+struct FPTS_AD_COEF_REG
+{
+    int16   uCoefNO1Ia;         // NO1Ia传感器系数标定因子       Q12
+    int16   uCoefNO1Ib;         // NO1Ib传感器系数标定因子       Q12
+    int16   uCoefNO1Ic;         // NO1Ic传感器系数标定因子       Q12
+    int16   uCoefNO2Ia;         // NO2Ia传感器系数标定因子       Q12
+    int16   uCoefNO2Ib;         // NO2Ib传感器系数标定因子       Q12
+    int16   uCoefNO2Ic;         // NO2Ic传感器系数标定因子       Q12
+    int16   uCoefNO1Uab;        // NO1Uab传感器系数标定因子     Q12
+    int16   uCoefNO1Ubc;        // NO1Ubc传感器系数标定因子     Q12
+    int16   uCoefNO2Uab;        // NO2Uab传感器系数标定因子     Q12
+    int16   uCoefNO2Ubc;        // NO2Ubc传感器系数标定因子     Q12
+
+    int16   uCoefOutUab;        // OutUab传感器系数标定因子      Q12
+    int16   uCoefOutUbc;        // OutUbc传感器系数标定因子      Q12
+    int16   uCoefTempA;         // TempA传感器系数标定因子        Q12
+    int16   uCoefTempB;         // TempB传感器系数标定因子        Q12
+    int16   uCoefTempC;         // TempC传感器系数标定因子        Q12
+    int16   uCoefrsvd;          // rsvd传感器系数标定因子          Q12
+
+    int16   nRrsev[48];         // 预留
+};
+
+// CPU中断参数组 64
+struct FPTS_TIMER1ISR_REG
+{
+	Uint16		uSystemStatus;		// 系统运行状态表
+	Uint16		uSystemInitErr;		// 系统初始化错误状态表
+	Uint16		uSystemRunErr;		// 系统运行故障状态表
+	Uint16		uSystemAlarmH;		// 系统运行报警状态表，高字节
+	Uint16		uSystemAlarmL;		// 系统运行报警状态表，低字节
+	Uint16		uGpioIn;			// 数字量输入
+	int16		uNO1RunStatus;		// 第一路电源运行状态
+	int16		uNO2RunStatus;		// 第二路电源运行状态
+	int16		uNO1Preferred;		// 第一路电源优先级
+	int16		uNO2Preferred;		// 第二路电源优先级
+
+	int16		uNO1VolRms;			// 第一路电源电压有效值
+	int16		uNO1CurRms;			// 第一路电源电流有效值
+	int16		uNO1Fre;			// 第一路电源频率
+	int16		uNO2VolRms;			// 第二路电源电压有效值
+	int16		uNO2CurRms;			// 第二路电源电流有效值
+	int16		uNO2Fre;			// 第二路电源频率
+	int16       uOutVolRms;         // 输出电源电压有效值
+	int16       uOutFre;            // 输出电源频率
+	int16		uT4UseTime;		    // T1中断运行时间 @3ms/cycle
+	int16		uSpOrMainDSPFre;	// 主/备用DSP运行频率
+
+	int16		uModATemp;	        // A相模块温度值，单位0.1℃
+	int16		uModBTemp;	        // B相模块温度值，单位0.1℃
+	int16		uModCTemp;	        // C相模块温度值，单位0.1℃
+	int16		uInstReg1;			// 备用寄存器1
+	int16		uInstReg2;			// 备用寄存器2
+	int16		uInstReg3;			// 备用寄存器3
+	int16		uInstReg4;			// 备用寄存器4
+	int16		uInstReg5;			// 备用寄存器5
+	int16		uInstReg6;		    // 备用寄存器6
+	int16		uInstReg7;		    // 备用寄存器7
+
+	int16		uInstReg8;		    // 备用寄存器8
+	int16		uInstReg9;		    // 备用寄存器9
+
+    int16		nRrsev[32];			// 预留
+};
+
+// PWM中断参数组 64
+struct FPTS_PWMISR_REG
+{
+	int16 uNO1Uab;					// 第一路电源AB电压  Q12
+	int16 uNO1Ubc;					// 第一路电源BC电压  Q12
+	int16 uNO1Uca;					// 第一路电源CA电压  Q12
+	int16 uNO2Uab;					// 第二路电源AB电压  Q12
+	int16 uNO2Ubc;					// 第二路电源BC电压  Q12
+	int16 uNO2Uca;					// 第二路电源CA电压  Q12
+	int16 uOutUab;					// 输出电源AB电压      Q12
+	int16 uOutUbc;					// 输出电源BC电压      Q12
+	int16 uOutUca;					// 输出电源CA电压      Q12
+	int16 uNO1URms;				    // 第一路电压总有效值 Q12
+
+	int16 uNO2URms;				    // 第二路电压总有效值 Q12
+	int16 uOutURms;				    // 输出电压总有效值     Q12
+	int16 uNO1Ia;					// 第一路电源A相线电流 Q12
+	int16 uNO1Ib;					// 第一路电源B相线电流 Q12
+	int16 uNO1Ic;					// 第一路电源C相线电流 Q12
+	int16 uNO2Ia;					// 第二路电源A相线电流 Q12
+	int16 uNO2Ib;					// 第二路电源B相线电流 Q12
+	int16 uNO2Ic;					// 第二路电源C相线电流 Q12
+	int16 uNO1IaRms;				// 第一路电源A相线电流有效值 Q12
+	int16 uNO1IbRms;				// 第一路电源B相线电流有效值 Q12
+
+	int16 uNO1IcRms;				// 第一路电源C相线电流有效值 Q12
+	int16 uNO2IaRms;				// 第二路电源A相线电流有效值 Q12
+	int16 uNO2IbRms;				// 第二路电源B相线电流有效值 Q12
+	int16 uNO2IcRms;				// 第二路电源C相线电流有效值 Q12
+	int16 uNO1IRms;				    // 第一路电源总有效值 Q12
+	int16 uNO2IRms;				    // 第二路电源总有效值 Q12
+	int16 uNO1Theta;                // 第一路电源角度值
+    int16 uNO2Theta;                // 第二路电源角度值
+    int16 uOutTheta;                // 输出电源角度值
+	int16 uT1UseTime;				// T1中断运行时间 @3.6Khz
+
+	int16 uModATemp;				// A相模块温度有效值Q12
+	int16 uModBTemp;				// B相模块温度有效值Q12
+	int16 uModCTemp;				// C相模块温度有效值Q12
+    int16 uActiveReg0;              // 备用寄存器0
+	int16 uActiveReg1;				// 备用寄存器1
+	int16 uActiveReg2;				// 备用寄存器2
+	int16 uActiveReg3;				// 备用寄存器3
+	int16 uActiveReg4;				// 备用寄存器4
+	int16 uActiveReg5;			    // 备用寄存器5
+	int16 uActiveReg6;			    // 备用寄存器6
+
+	int16 uActiveReg7;			    // 备用寄存器7
+	int16 uActiveReg8;			    // 备用寄存器8
+	int16 uActiveReg9;			    // 备用寄存器9
+
+    int16 nRrsev[21];				// 预留
+};
+
+// 重要数据保存参数组 64
+struct FPTS_EMERGENCY_REG
+{
+    int16 uEmDataSize;              // 重要数据存储区域大小
+    int16 uEmDataNumMax;            // 重要数据最大存储个数
+    int16 uEmDataSaveTime;          // 重要数据保存时间
+    int16 uEmDataChgEnable;         // 重要数据存储使能开关，写0x5555使能
+    int16 uEmDataChgFlag;           // 重要数据允许更改标记
+    int16 uEmData0Addr;             // 重要数据0地址
+    int16 uEmData1Addr;             // 重要数据1地址
+    int16 uEmData2Addr;             // 重要数据2地址
+    int16 uEmData3Addr;             // 重要数据3地址
+    int16 uEmData4Addr;             // 重要数据4地址
+
+    int16 uEmData5Addr;             // 重要数据5地址
+    int16 uEmData6Addr;             // 重要数据6地址
+    int16 uEmData7Addr;             // 重要数据7地址
+    int16 uEmCountRam;              // 重要数据保存计数器
+    int16 uEmCountBlock;            // 重要数据块计数器
+    int16 uEmDataSaveFinishFlag;    // 重要数据保存成功标记 0-保存未完成 1-保存完成
+    int16 uEmDataFlashWriteOK;      // 重要数据写入FLASH成功标记 0-未成功写入 1-写入成功
+
+    int16 nRrsev[47];               // 预留
+};
+
+struct PARAMETER_REGS
+{
+   	struct FPTS_POWER_REG       PowerReg;	    // 快速电源自动转换装置电源参数表		64
+   	struct FPTS_PI_REG          PIReg;       	// 快速电源自动转换装置SPLL的PI参数表 64
+   	struct FPTS_RUN_CTRL_REG    RunCtrlReg;		// 快速电源自动转换装置运行控制参数表  64
+    struct FPTS_AD_COEF_REG     ADCoefReg;      // 快速电源自动转换装置传感器系数控制参数组 64
+	struct FPTS_TIMER1ISR_REG   Timer1Reg;      // 快速电源自动转换装置静态运行参数     64
+	struct FPTS_PWMISR_REG		PWMReg;		    // 快速电源自动转换装置动态参数表        64
+	struct FPTS_EMERGENCY_REG   EmergencyReg;   // 快速电源自动转换装置重要数据保存参数组 64
+};
+
+extern struct PARAMETER_REGS ParaTable;
+
+
+/*-------------------------系统控制参数定义----------------------------
+*   包含：系统控制参数定义
+*   说明：标记、状态寄存器固定32个BIT，计数寄存器无固定大小
+*
+*-------------------------系统参数表定义----------------------------*/
+//------------------------------------------------------------
+// 系统运行标记、状态位
+
+//------------------------------------------------------------
+struct  FLAG_SYSTEM_BITS{                   // 位定义  0为正常    1为异常
+    Uint16 CanSend              : 1;        // 0
+    Uint16 ChgNo1ToNo2          : 1;        // 1
+    Uint16 ChgNo2ToNo1          : 1;        // 2
+    Uint16 ABChannelOn          : 1;        // 3
+    Uint16 NO1Preferred         : 1;        // 4
+    Uint16 NO2Preferred         : 1;        // 5
+    Uint16 ChgDataSave          : 1;        // 6
+    Uint16 ForceModeOn          : 1;        // 7
+    Uint16 AllchannelOn         : 1;        // 8
+    Uint16 RmtMode              : 1;        // 9
+    Uint16 RmtStart             : 1;        // 10
+    Uint16 SoftStart            : 1;        // 11
+    Uint16 FreqIOToSpareDSP     : 1;        // 12
+    Uint16 SoftDataSave         : 1;        // 13
+    Uint16 XintIOCatch          : 1;        // 14
+    Uint16 EmDataFlashWriteOK   : 1;        // 15
+    Uint16 EmDataChgFlag        : 1;        // 16
+    Uint16 ParaDataChg          : 1;        // 17
+    Uint32 rsvd                 : 11;       // 18-31
+};
+
+union   FLAG_SYSTEM{
+    Uint32 all;
+    struct FLAG_SYSTEM_BITS bit;
+};
+
+struct  STATE_SYSTEM_BITS{                  // 位定义  0为正常    1为异常
+    Uint16 NO1Ready             : 1;        // 0
+    Uint16 NO2Ready             : 1;        // 1
+    Uint16 NO1Active            : 1;        // 2
+    Uint16 NO2Active            : 1;        // 3
+    Uint16 SoftStartSuccess     : 1;        // 4
+    Uint16 rsvd                 : 11;       // 5-15
+};
+
+union   STATE_SYSTEM{
+    Uint16 all;
+    struct STATE_SYSTEM_BITS bit;
+};
+
+//------------------------------------------------------------
+// 系统运行计数寄存器
+
+//------------------------------------------------------------
+struct  COUNT_SYSTEM{
+    Uint16 NO1UrmsLow;
+    Uint16 NO1UrmsHigh;
+    Uint16 NO2UrmsLow;
+    Uint16 NO2UrmsHigh;
+    Uint16 NO1CurHighAlarm;
+    Uint16 NO1CurHighCut;
+    Uint16 NO2CurHighAlarm;
+    Uint16 NO2CurHighCut;
+    Uint16 DelayChgULow;
+    Uint16 DirectChg;
+
+    Uint16 ForceChangeDelay;
+    Uint16 ForceChangeTime;
+    Uint16 SoftStartDelay;
+    Uint16 SoftStartAlpha;
+    Uint16 NO1ZeroCrossDelay;
+    Uint16 NO2ZeroCrossDelay;
+    Uint16 DelayProtectNO1;
+    Uint16 DelayProtectNO2;
+    Uint16 DelayNormDetc;
+    Uint16 DelayTempAlarm;
+
+    Uint16 DelayTempCut;
+    Uint16 DelaySysWait;
+    int16  NO1ASCRShortDetc;
+    int16  NO1BSCRShortDetc;
+    int16  NO1CSCRShortDetc;
+    int16  NO2ASCRShortDetc;
+    int16  NO2BSCRShortDetc;
+    int16  NO2CSCRShortDetc;
+    int16  NO1ASCRBrokenDetc;
+    int16  NO1BSCRBrokenDetc;
+
+    int16  NO1CSCRBrokenDetc;
+    int16  NO2ASCRBrokenDetc;
+    int16  NO2BSCRBrokenDetc;
+    int16  NO2CSCRBrokenDetc;
+    int16  FaultReset;
+    Uint16 DelayForceChg;
+    Uint16 DelayResetChg;
+    Uint16 SoftStart;
+    Uint16 XintIORelease;
+    Uint16 XintIOCatch;
+
+    Uint16 ForceReset;
+    Uint16 ParaTableReset;
+    Uint16 PDPInitCount;
+    Uint16 T1Cycle;
+    Uint16 T4Cycle;
+    Uint16 CanRst;
+};
+
+struct  PWMISR_REGS{
+    Uint16 NO1URms;
+    Uint16 NO2URms;
+    Uint16 OutURms;
+    Uint16 NO1IRms;
+    Uint16 NO1IaRms;
+    Uint16 NO1IbRms;
+    Uint16 NO1IcRms;
+    Uint16 NO2IRms;
+    Uint16 NO2IaRms;
+    Uint16 NO2IbRms;
+    Uint16 NO2IcRms;
+    Uint16 TempARms;
+    Uint16 TempBRms;
+    Uint16 TempCRms;
+    Uint16 SpOrMainDSPFre;
+};
+
+/******************函数声明*********************/
+void ReadParaFromFlash(void);
+void WtiteDefaultToFlash(void);
+int UpdataParaToFlash(void);
+
+#endif

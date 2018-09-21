@@ -1,0 +1,284 @@
+
+**** Build of configuration Debug for project RT_FPTS_MAIN ****
+
+"C:\\ti\\ccsv6\\utils\\bin\\gmake" -k all 
+'Building file: ../source/DSP2833x_Adc.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/DSP2833x_Adc.d" --obj_directory="source"  "../source/DSP2833x_Adc.c"
+'Finished building: ../source/DSP2833x_Adc.c'
+' '
+'Building file: ../source/DSP2833x_CpuTimers.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/DSP2833x_CpuTimers.d" --obj_directory="source"  "../source/DSP2833x_CpuTimers.c"
+'Finished building: ../source/DSP2833x_CpuTimers.c'
+' '
+'Building file: ../source/DSP2833x_DMA.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/DSP2833x_DMA.d" --obj_directory="source"  "../source/DSP2833x_DMA.c"
+'Finished building: ../source/DSP2833x_DMA.c'
+' '
+'Building file: ../source/DSP2833x_DefaultIsr.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/DSP2833x_DefaultIsr.d" --obj_directory="source"  "../source/DSP2833x_DefaultIsr.c"
+'Finished building: ../source/DSP2833x_DefaultIsr.c'
+' '
+'Building file: ../source/DSP2833x_Delay.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/DSP2833x_Delay.d" --obj_directory="source"  "../source/DSP2833x_Delay.c"
+'Finished building: ../source/DSP2833x_Delay.c'
+' '
+'Building file: ../source/DSP2833x_ECan.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/DSP2833x_ECan.d" --obj_directory="source"  "../source/DSP2833x_ECan.c"
+'Finished building: ../source/DSP2833x_ECan.c'
+' '
+'Building file: ../source/DSP2833x_GlobalVariableDefs.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/DSP2833x_GlobalVariableDefs.d" --obj_directory="source"  "../source/DSP2833x_GlobalVariableDefs.c"
+'Finished building: ../source/DSP2833x_GlobalVariableDefs.c'
+' '
+'Building file: ../source/DSP2833x_MemCopy.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/DSP2833x_MemCopy.d" --obj_directory="source"  "../source/DSP2833x_MemCopy.c"
+'Finished building: ../source/DSP2833x_MemCopy.c'
+' '
+'Building file: ../source/DSP2833x_PieCtrl.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/DSP2833x_PieCtrl.d" --obj_directory="source"  "../source/DSP2833x_PieCtrl.c"
+'Finished building: ../source/DSP2833x_PieCtrl.c'
+' '
+'Building file: ../source/DSP2833x_PieVect.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/DSP2833x_PieVect.d" --obj_directory="source"  "../source/DSP2833x_PieVect.c"
+'Finished building: ../source/DSP2833x_PieVect.c'
+' '
+'Building file: ../source/DSP2833x_Sci.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/DSP2833x_Sci.d" --obj_directory="source"  "../source/DSP2833x_Sci.c"
+'Finished building: ../source/DSP2833x_Sci.c'
+' '
+'Building file: ../source/DSP2833x_SysCtrl.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/DSP2833x_SysCtrl.d" --obj_directory="source"  "../source/DSP2833x_SysCtrl.c"
+'Finished building: ../source/DSP2833x_SysCtrl.c'
+' '
+'Building file: ../source/DSP2833x_Xintf.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/DSP2833x_Xintf.d" --obj_directory="source"  "../source/DSP2833x_Xintf.c"
+'Finished building: ../source/DSP2833x_Xintf.c'
+' '
+'Building file: ../source/USERS_Arithmetic.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/USERS_Arithmetic.d" --obj_directory="source"  "../source/USERS_Arithmetic.c"
+'Finished building: ../source/USERS_Arithmetic.c'
+' '
+'Building file: ../source/USERS_Cap.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/USERS_Cap.d" --obj_directory="source"  "../source/USERS_Cap.c"
+'Finished building: ../source/USERS_Cap.c'
+' '
+'Building file: ../source/USERS_Cpld.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/USERS_Cpld.d" --obj_directory="source"  "../source/USERS_Cpld.c"
+'Finished building: ../source/USERS_Cpld.c'
+' '
+'Building file: ../source/USERS_DigitalIo.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/USERS_DigitalIo.d" --obj_directory="source"  "../source/USERS_DigitalIo.c"
+'Finished building: ../source/USERS_DigitalIo.c'
+' '
+'Building file: ../source/USERS_EPwm.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/USERS_EPwm.d" --obj_directory="source"  "../source/USERS_EPwm.c"
+'Finished building: ../source/USERS_EPwm.c'
+' '
+'Building file: ../source/USERS_ExRam.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/USERS_ExRam.d" --obj_directory="source"  "../source/USERS_ExRam.c"
+'Finished building: ../source/USERS_ExRam.c'
+' '
+'Building file: ../source/USERS_Flash.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/USERS_Flash.d" --obj_directory="source"  "../source/USERS_Flash.c"
+'Finished building: ../source/USERS_Flash.c'
+' '
+'Building file: ../source/USERS_Main.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/USERS_Main.d" --obj_directory="source"  "../source/USERS_Main.c"
+'Finished building: ../source/USERS_Main.c'
+' '
+'Building file: ../source/USERS_Modbus.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/USERS_Modbus.d" --obj_directory="source"  "../source/USERS_Modbus.c"
+'Finished building: ../source/USERS_Modbus.c'
+' '
+'Building file: ../source/USERS_ParaTab.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/USERS_ParaTab.d" --obj_directory="source"  "../source/USERS_ParaTab.c"
+'Finished building: ../source/USERS_ParaTab.c'
+' '
+'Building file: ../source/USERS_Protect.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/USERS_Protect.d" --obj_directory="source"  "../source/USERS_Protect.c"
+'Finished building: ../source/USERS_Protect.c'
+' '
+'Building file: ../source/USERS_T1.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/USERS_T1.d" --obj_directory="source"  "../source/USERS_T1.c"
+'Finished building: ../source/USERS_T1.c'
+' '
+'Building file: ../source/USERS_T4.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/USERS_T4.d" --obj_directory="source"  "../source/USERS_T4.c"
+'Finished building: ../source/USERS_T4.c'
+' '
+'Building target: RT_FPTS_MAIN.out'
+'Invoking: C2000 Linker'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 -g --display_error_number --diag_warning=225 --diag_wrap=off -z -m"RT_FPTS_MAIN.map" --stack_size=0x300 --warn_sections -i"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/lib" -i"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --reread_libs --diag_wrap=off --display_error_number --xml_link_info="RT_FPTS_MAIN_linkInfo.xml" --rom_model -o "RT_FPTS_MAIN.out" "./source/DSP2833x_ADC_cal.obj" "./source/DSP2833x_Adc.obj" "./source/DSP2833x_CSMPasswords.obj" "./source/DSP2833x_CodeStartBranch.obj" "./source/DSP2833x_CpuTimers.obj" "./source/DSP2833x_DMA.obj" "./source/DSP2833x_DefaultIsr.obj" "./source/DSP2833x_Delay.obj" "./source/DSP2833x_ECan.obj" "./source/DSP2833x_GlobalVariableDefs.obj" "./source/DSP2833x_MemCopy.obj" "./source/DSP2833x_PieCtrl.obj" "./source/DSP2833x_PieVect.obj" "./source/DSP2833x_Sci.obj" "./source/DSP2833x_SysCtrl.obj" "./source/DSP2833x_Xintf.obj" "./source/DSP2833x_usDelay.obj" "./source/USERS_Arithmetic.obj" "./source/USERS_Cap.obj" "./source/USERS_Cpld.obj" "./source/USERS_DigitalIo.obj" "./source/USERS_EPwm.obj" "./source/USERS_ExRam.obj" "./source/USERS_Flash.obj" "./source/USERS_Main.obj" "./source/USERS_Modbus.obj" "./source/USERS_ParaTab.obj" "./source/USERS_Protect.obj" "./source/USERS_T1.obj" "./source/USERS_T4.obj" "../cmd/DSP2833x_Headers_nonBIOS.cmd" "../cmd/F28335.cmd" "../lib/IQmath.lib" "../lib/SFO_TI_Build.lib" "../lib/SFO_TI_Build_V5.lib" "../lib/SFO_TI_Build_V5_fpu.lib" "../lib/SFO_TI_Build_fpu.lib"  -llibc.a 
+<Linking>
+'Finished building target: RT_FPTS_MAIN.out'
+' '
+
+**** Build Finished ****
+
+**** Build of configuration Debug for project RT_FPTS_MAIN ****
+
+"C:\\ti\\ccsv6\\utils\\bin\\gmake" -k all 
+'Building file: ../source/DSP2833x_Adc.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/DSP2833x_Adc.d" --obj_directory="source"  "../source/DSP2833x_Adc.c"
+'Finished building: ../source/DSP2833x_Adc.c'
+' '
+'Building file: ../source/DSP2833x_CpuTimers.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/DSP2833x_CpuTimers.d" --obj_directory="source"  "../source/DSP2833x_CpuTimers.c"
+'Finished building: ../source/DSP2833x_CpuTimers.c'
+' '
+'Building file: ../source/DSP2833x_DMA.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/DSP2833x_DMA.d" --obj_directory="source"  "../source/DSP2833x_DMA.c"
+'Finished building: ../source/DSP2833x_DMA.c'
+' '
+'Building file: ../source/DSP2833x_DefaultIsr.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/DSP2833x_DefaultIsr.d" --obj_directory="source"  "../source/DSP2833x_DefaultIsr.c"
+'Finished building: ../source/DSP2833x_DefaultIsr.c'
+' '
+'Building file: ../source/DSP2833x_Delay.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/DSP2833x_Delay.d" --obj_directory="source"  "../source/DSP2833x_Delay.c"
+'Finished building: ../source/DSP2833x_Delay.c'
+' '
+'Building file: ../source/DSP2833x_ECan.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/DSP2833x_ECan.d" --obj_directory="source"  "../source/DSP2833x_ECan.c"
+'Finished building: ../source/DSP2833x_ECan.c'
+' '
+'Building file: ../source/DSP2833x_GlobalVariableDefs.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/DSP2833x_GlobalVariableDefs.d" --obj_directory="source"  "../source/DSP2833x_GlobalVariableDefs.c"
+'Finished building: ../source/DSP2833x_GlobalVariableDefs.c'
+' '
+'Building file: ../source/DSP2833x_MemCopy.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/DSP2833x_MemCopy.d" --obj_directory="source"  "../source/DSP2833x_MemCopy.c"
+'Finished building: ../source/DSP2833x_MemCopy.c'
+' '
+'Building file: ../source/DSP2833x_PieCtrl.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/DSP2833x_PieCtrl.d" --obj_directory="source"  "../source/DSP2833x_PieCtrl.c"
+'Finished building: ../source/DSP2833x_PieCtrl.c'
+' '
+'Building file: ../source/DSP2833x_PieVect.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/DSP2833x_PieVect.d" --obj_directory="source"  "../source/DSP2833x_PieVect.c"
+'Finished building: ../source/DSP2833x_PieVect.c'
+' '
+'Building file: ../source/DSP2833x_Sci.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/DSP2833x_Sci.d" --obj_directory="source"  "../source/DSP2833x_Sci.c"
+'Finished building: ../source/DSP2833x_Sci.c'
+' '
+'Building file: ../source/DSP2833x_SysCtrl.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/DSP2833x_SysCtrl.d" --obj_directory="source"  "../source/DSP2833x_SysCtrl.c"
+'Finished building: ../source/DSP2833x_SysCtrl.c'
+' '
+'Building file: ../source/DSP2833x_Xintf.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/DSP2833x_Xintf.d" --obj_directory="source"  "../source/DSP2833x_Xintf.c"
+'Finished building: ../source/DSP2833x_Xintf.c'
+' '
+'Building file: ../source/USERS_Arithmetic.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/USERS_Arithmetic.d" --obj_directory="source"  "../source/USERS_Arithmetic.c"
+'Finished building: ../source/USERS_Arithmetic.c'
+' '
+'Building file: ../source/USERS_Cap.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/USERS_Cap.d" --obj_directory="source"  "../source/USERS_Cap.c"
+'Finished building: ../source/USERS_Cap.c'
+' '
+'Building file: ../source/USERS_Cpld.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/USERS_Cpld.d" --obj_directory="source"  "../source/USERS_Cpld.c"
+'Finished building: ../source/USERS_Cpld.c'
+' '
+'Building file: ../source/USERS_DigitalIo.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/USERS_DigitalIo.d" --obj_directory="source"  "../source/USERS_DigitalIo.c"
+'Finished building: ../source/USERS_DigitalIo.c'
+' '
+'Building file: ../source/USERS_EPwm.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/USERS_EPwm.d" --obj_directory="source"  "../source/USERS_EPwm.c"
+'Finished building: ../source/USERS_EPwm.c'
+' '
+'Building file: ../source/USERS_ExRam.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/USERS_ExRam.d" --obj_directory="source"  "../source/USERS_ExRam.c"
+'Finished building: ../source/USERS_ExRam.c'
+' '
+'Building file: ../source/USERS_Flash.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/USERS_Flash.d" --obj_directory="source"  "../source/USERS_Flash.c"
+'Finished building: ../source/USERS_Flash.c'
+' '
+'Building file: ../source/USERS_Main.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/USERS_Main.d" --obj_directory="source"  "../source/USERS_Main.c"
+'Finished building: ../source/USERS_Main.c'
+' '
+'Building file: ../source/USERS_Modbus.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/USERS_Modbus.d" --obj_directory="source"  "../source/USERS_Modbus.c"
+'Finished building: ../source/USERS_Modbus.c'
+' '
+'Building file: ../source/USERS_ParaTab.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/USERS_ParaTab.d" --obj_directory="source"  "../source/USERS_ParaTab.c"
+'Finished building: ../source/USERS_ParaTab.c'
+' '
+'Building file: ../source/USERS_Protect.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/USERS_Protect.d" --obj_directory="source"  "../source/USERS_Protect.c"
+'Finished building: ../source/USERS_Protect.c'
+' '
+'Building file: ../source/USERS_T1.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/USERS_T1.d" --obj_directory="source"  "../source/USERS_T1.c"
+'Finished building: ../source/USERS_T1.c'
+' '
+'Building file: ../source/USERS_T4.c'
+'Invoking: C2000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --include_path="E:/SOFT CODE/DSP_Soft/Soft28335/RT-FPTS/[v4.2]RT_FPTS_PRO_MAIN/RT_FPTS_MAIN/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/USERS_T4.d" --obj_directory="source"  "../source/USERS_T4.c"
+'Finished building: ../source/USERS_T4.c'
+' '
+'Building target: RT_FPTS_MAIN.out'
+'Invoking: C2000 Linker'
+"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 -g --display_error_number --diag_warning=225 --diag_wrap=off -z -m"RT_FPTS_MAIN.map" --stack_size=0x300 --warn_sections -i"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/lib" -i"C:/ti/ccsv6/tools/compiler/c2000_15.12.3.LTS/include" --reread_libs --diag_wrap=off --display_error_number --xml_link_info="RT_FPTS_MAIN_linkInfo.xml" --rom_model -o "RT_FPTS_MAIN.out" "./source/DSP2833x_ADC_cal.obj" "./source/DSP2833x_Adc.obj" "./source/DSP2833x_CSMPasswords.obj" "./source/DSP2833x_CodeStartBranch.obj" "./source/DSP2833x_CpuTimers.obj" "./source/DSP2833x_DMA.obj" "./source/DSP2833x_DefaultIsr.obj" "./source/DSP2833x_Delay.obj" "./source/DSP2833x_ECan.obj" "./source/DSP2833x_GlobalVariableDefs.obj" "./source/DSP2833x_MemCopy.obj" "./source/DSP2833x_PieCtrl.obj" "./source/DSP2833x_PieVect.obj" "./source/DSP2833x_Sci.obj" "./source/DSP2833x_SysCtrl.obj" "./source/DSP2833x_Xintf.obj" "./source/DSP2833x_usDelay.obj" "./source/USERS_Arithmetic.obj" "./source/USERS_Cap.obj" "./source/USERS_Cpld.obj" "./source/USERS_DigitalIo.obj" "./source/USERS_EPwm.obj" "./source/USERS_ExRam.obj" "./source/USERS_Flash.obj" "./source/USERS_Main.obj" "./source/USERS_Modbus.obj" "./source/USERS_ParaTab.obj" "./source/USERS_Protect.obj" "./source/USERS_T1.obj" "./source/USERS_T4.obj" "../cmd/DSP2833x_Headers_nonBIOS.cmd" "../cmd/F28335.cmd" "../lib/IQmath.lib" "../lib/SFO_TI_Build.lib" "../lib/SFO_TI_Build_V5.lib" "../lib/SFO_TI_Build_V5_fpu.lib" "../lib/SFO_TI_Build_fpu.lib"  -llibc.a 
+<Linking>
+'Finished building target: RT_FPTS_MAIN.out'
+' '
+
+**** Build Finished ****

@@ -1,0 +1,718 @@
+/*****************头文件********************/
+
+#include "DSP2833x_Device.h"     
+#include "DSP2833x_Examples.h"
+
+extern struct AD_BUFS                   DataInst;
+extern struct AD_BUFS                   DataZero;
+extern struct AD_BUFS                   DataBuf;
+extern struct AD_BUFS                   DataFactor;
+extern struct AD_BUFS                   DataNormal;
+extern struct AD_BUFS                   DataMax;
+extern union  FLAG_GPIOIN   	 		FlagGpioIn;
+extern union  FLAG_SYSTEM_INITERR 		FlagSysInitErr;
+extern union  FLAG_SYSTEM_RUNERR 		FlagSysRunErr;
+extern union  FLAG_SYSTEM				FlagSystem;
+extern union  STATE_SYSTEM				StateSystem;
+extern union  FLAG_SYSTEM_ALARM			FlagSysAlarm;
+extern struct SPLL_REGS 				SpllRegNO1;
+extern struct SPLL_REGS 				SpllRegNO2;
+extern struct SPLL_REGS 				SpllRegOut;
+extern struct SPLL_REGS					SpllRegUFO;
+extern struct COUNT_SYSTEM				CountSystem;
+extern struct PWMISR_REGS               PwmIsrReg;
+extern enum   SYSTEM_STATE 				SystemState;
+extern struct URMS_REGS			        NO1IARegs;
+extern struct URMS_REGS			        NO1IBRegs;
+extern struct URMS_REGS			        NO1ICRegs;
+extern struct URMS_REGS			        NO2IARegs;
+extern struct URMS_REGS			        NO2IBRegs;
+extern struct URMS_REGS			        NO2ICRegs;
+extern struct URMS_REGS                 ModATempRegs;
+extern struct URMS_REGS                 ModBTempRegs;
+extern struct URMS_REGS                 ModCTempRegs;
+
+extern int16  SinTab[1024];
+extern int16 *EmDataAddrArray[8];
+
+void 	ThetaCalculate(struct SPLL_REGS *spllreg);
+Uint16 	BreakCloseNo1ToNo2(void);
+Uint16 	BreakCloseNo2ToNo1(void);
+Uint16 	NO1CurZeroCrossDetec(void);
+Uint16 	NO2CurZeroCrossDetec(void);
+void 	SaveT1VarToPara(void);								// 更新参数表
+Uint16  MotorSoftStart(Uint16 channel, struct SPLL_REGS *spllreg, Uint16 init_alpha, int16 step_time);
+
+void InitT1Var(void)
+{
+    Uint16 i;
+    Uint16 *pDataNormal, *pDataMax, *pDataFactor;
+
+    SpllRegNO1.SpllCosa         = 1;
+    SpllRegNO1.SpllCnt          = 1000;
+    SpllRegNO1.SpllKp           = ParaTable.PIReg.uNO1Kp;
+    SpllRegNO1.SpllKi           = ParaTable.PIReg.uNO1Ki;
+    SpllRegNO1.SpllKc           = (int32)SpllRegNO1.SpllKi * 4096 / SpllRegNO1.SpllKp;
+    SpllRegNO1.SpllPIOutMax     = ParaTable.PIReg.uNO1PIMax;
+    SpllRegNO1.SpllPIOutMin     = ParaTable.PIReg.uNO1PIMin;
+
+    SpllRegNO2.SpllCosa         = 1;
+    SpllRegNO2.SpllCnt          = 1000;
+    SpllRegNO2.SpllKp           = ParaTable.PIReg.uNO2Kp;
+    SpllRegNO2.SpllKi           = ParaTable.PIReg.uNO2Ki;
+    SpllRegNO2.SpllKc           = (int32)SpllRegNO2.SpllKi * 4096 / SpllRegNO2.SpllKp;
+    SpllRegNO2.SpllPIOutMax     = ParaTable.PIReg.uNO2PIMax;
+    SpllRegNO2.SpllPIOutMin     = ParaTable.PIReg.uNO2PIMin;
+
+    SpllRegOut.SpllCosa         = 1;
+    SpllRegOut.SpllCnt          = 1000;
+    SpllRegOut.SpllKp           = ParaTable.PIReg.uOutKp;
+    SpllRegOut.SpllKi           = ParaTable.PIReg.uOutKi;
+    SpllRegOut.SpllKc           = (int32)SpllRegOut.SpllKi * 4096 / SpllRegOut.SpllKp;
+    SpllRegOut.SpllPIOutMax     = ParaTable.PIReg.uOutPIMax;
+    SpllRegOut.SpllPIOutMin     = ParaTable.PIReg.uOutPIMin;
+
+    SpllRegUFO.SpllCosa         = 1;
+    SpllRegUFO.SpllCnt          = 1000;
+    SpllRegUFO.SpllKp           = ParaTable.PIReg.uOutKp;
+    SpllRegUFO.SpllKi           = ParaTable.PIReg.uOutKi;
+    SpllRegUFO.SpllKc           = (int32)SpllRegUFO.SpllKi * 4096 / SpllRegUFO.SpllKp;
+    SpllRegUFO.SpllPIOutMax     = ParaTable.PIReg.uOutPIMax;
+    SpllRegUFO.SpllPIOutMin     = ParaTable.PIReg.uOutPIMin;
+
+    DataNormal.NO1Ia  = ParaTable.PowerReg.uNO1PowerCur;
+    DataNormal.NO1Ib  = ParaTable.PowerReg.uNO1PowerCur;
+    DataNormal.NO1Ic  = ParaTable.PowerReg.uNO1PowerCur;
+    DataNormal.NO1Uab = ParaTable.PowerReg.uNO1PowerVol;
+    DataNormal.NO1Ubc = ParaTable.PowerReg.uNO1PowerVol;
+    DataNormal.NO2Ia  = ParaTable.PowerReg.uNO2PowerCur;
+    DataNormal.NO2Ib  = ParaTable.PowerReg.uNO2PowerCur;
+    DataNormal.NO2Ic  = ParaTable.PowerReg.uNO2PowerCur;
+    DataNormal.NO2Uab = ParaTable.PowerReg.uNO2PowerVol;
+    DataNormal.NO2Ubc = ParaTable.PowerReg.uNO2PowerVol;
+    DataNormal.OutUab = ParaTable.PowerReg.uOutPowerVol;
+    DataNormal.OutUbc = ParaTable.PowerReg.uOutPowerVol;
+    DataNormal.TempA  = ParaTable.PowerReg.uModATemp;
+    DataNormal.TempB  = ParaTable.PowerReg.uModBTemp;
+    DataNormal.TempC  = ParaTable.PowerReg.uModCTemp;
+
+    DataMax.NO1Ia  = ParaTable.RunCtrlReg.XSMaxNO1Cur;
+    DataMax.NO1Ib  = ParaTable.RunCtrlReg.XSMaxNO1Cur;
+    DataMax.NO1Ic  = ParaTable.RunCtrlReg.XSMaxNO1Cur;
+    DataMax.NO1Uab = ParaTable.RunCtrlReg.XSMaxNO1Vol;
+    DataMax.NO1Ubc = ParaTable.RunCtrlReg.XSMaxNO1Vol;
+    DataMax.NO2Ia  = ParaTable.RunCtrlReg.XSMaxNO2Cur;
+    DataMax.NO2Ib  = ParaTable.RunCtrlReg.XSMaxNO2Cur;
+    DataMax.NO2Ic  = ParaTable.RunCtrlReg.XSMaxNO2Cur;
+    DataMax.NO2Uab = ParaTable.RunCtrlReg.XSMaxNO2Vol;
+    DataMax.NO2Ubc = ParaTable.RunCtrlReg.XSMaxNO2Vol;
+    DataMax.OutUab = ParaTable.RunCtrlReg.XSMaxOutVol;
+    DataMax.OutUbc = ParaTable.RunCtrlReg.XSMaxOutVol;
+    DataMax.TempA  = ParaTable.RunCtrlReg.XSMaxModATemp >> 1;
+    DataMax.TempB  = ParaTable.RunCtrlReg.XSMaxModBTemp >> 1;
+    DataMax.TempC  = ParaTable.RunCtrlReg.XSMaxModCTemp >> 1;
+
+    pDataNormal = (Uint16 *)&DataNormal;
+    pDataMax = (Uint16 *)&DataMax;
+    pDataFactor = (Uint16 *)&DataFactor;
+    for (i = 0; i < 16; i++, pDataNormal++, pDataMax++, pDataFactor++)
+    {
+        *pDataFactor = ((Uint32)*pDataMax * 1024) / (*pDataNormal);     // Q10
+    }
+}
+
+#pragma CODE_SECTION(ReadT1VarFromPara, "ramcode")
+
+void  ReadT1VarFromPara(void)
+{
+	if(ParaTable.EmergencyReg.uEmDataChgEnable == 0x5555)
+	{
+	    FlagSystem.bit.EmDataChgFlag = 1;
+	}
+	else
+	{
+	    FlagSystem.bit.EmDataChgFlag = 0;
+	}
+}
+
+/*---------------------------------------------------------------------
+函数原型：interrupt void ePWM1ISR(void)
+函数名称：epwm1中断
+函数功能：
+入口参数：无
+出口参数：无
+作    者：
+日    期：
+----------------------------------------------------------------------*/
+#pragma CODE_SECTION(ePWM1ISR, "ramcode")
+
+interrupt void ePWM1ISR(void)
+{
+	static Uint16 CountAngle = 0;
+	int16  temp, i, Uab20, Ubc20;
+    int16 *pDataBuf, *pDataInst, *pDataZero, *pDataFactor;
+
+	DINT;
+	EPwm1Regs.ETCLR.bit.INT = 1;					// 清除定时器INT标识
+	PieCtrlRegs.PIEACK.all  = PIEACK_GROUP3;		// 清除INT3应答
+	CpuTimer2Regs.TIM.all	= CpuTimer2Regs.PRD.all;
+
+	/**********************项目程序*********************/
+
+//    // 向备用DSP发送状态
+//    FlagSystem.bit.FreqIOToSpareDSP = !FlagSystem.bit.FreqIOToSpareDSP;
+//    ControlGPIOOut(D00, FlagSystem.bit.FreqIOToSpareDSP);
+
+    // AD采样数据读取及处理
+    ADSampleOfDMA();
+    ReadT1VarFromPara();
+
+    /* ---原始数据采样--- */
+    pDataBuf  = (int16 *)&DataBuf;
+    pDataInst = (int16 *)&DataInst;
+    pDataZero = (int16 *)&DataZero;
+    pDataFactor = (int16 *)&DataFactor;
+    for (i = 0; i < 16; i++, pDataBuf++, pDataInst++, pDataZero++, pDataFactor++)
+    {
+        temp = (int32)(*pDataInst - *pDataZero) * (*pDataFactor) >> 9;      // Q11 * Q10 >> 9 = Q12
+        *pDataBuf = ((int32)*pDataBuf * 3 + temp) >> 2;
+    }
+
+    SaveT1VarToPara();
+    T1VarSave();
+    T1EmergencySave(FlagSysRunErr.bit.FlagPDP);
+
+    /*----------------------算法写在我下面-------------------------*/
+// 1、第一路电源锁相
+	FlagSysAlarm.bit.NO1SPLLAlarm = SpllCalc(&SpllRegNO1, DataBuf.NO1Uab, DataBuf.NO1Ubc);
+	PwmIsrReg.NO1URms = ((int32)PwmIsrReg.NO1URms * LPF_K1 + SpllRegNO1.SpllVcdFineP) >> LPF_K2;
+	ThetaCalculate(&SpllRegNO1);
+
+// 2、第二路电源锁相
+	FlagSysAlarm.bit.NO2SPLLAlarm = SpllCalc(&SpllRegNO2, DataBuf.NO2Uab, DataBuf.NO2Ubc);
+	PwmIsrReg.NO2URms = ((int32)PwmIsrReg.NO2URms * LPF_K1 + SpllRegNO2.SpllVcdFineP) >> LPF_K2;
+	ThetaCalculate(&SpllRegNO2);
+
+// 3、根据当前电源运行状态，计算备电与输出的差值锁相
+	if (1 == StateSystem.bit.NO1Active)
+	{
+		Uab20 = (DataBuf.NO2Uab - DataBuf.OutUab) >> 1;		// 避免超量程
+		Ubc20 = (DataBuf.NO2Ubc - DataBuf.OutUbc) >> 1;
+		SpllCalc(&SpllRegUFO, Uab20, Ubc20);
+		ThetaCalculate(&SpllRegUFO);
+	}
+	else if (1 == StateSystem.bit.NO2Active)
+	{
+		Uab20 = (DataBuf.NO1Uab - DataBuf.OutUab) >> 1;		// 避免超量程
+		Ubc20 = (DataBuf.NO1Ubc - DataBuf.OutUbc) >> 1;
+		SpllCalc(&SpllRegUFO, Uab20, Ubc20);
+		ThetaCalculate(&SpllRegUFO);
+	}
+
+// 4、计算每相电流有效值
+	PwmIsrReg.NO1IaRms = URmsCalc(DataBuf.NO1Ia , &NO1IARegs, CONST_W) * 2;
+	PwmIsrReg.NO1IbRms = URmsCalc(DataBuf.NO1Ib , &NO1IBRegs, CONST_W) * 2;
+	PwmIsrReg.NO1IcRms = URmsCalc(DataBuf.NO1Ic , &NO1ICRegs, CONST_W) * 2;
+	PwmIsrReg.NO2IaRms = URmsCalc(DataBuf.NO2Ia , &NO2IARegs, CONST_W) * 2;
+	PwmIsrReg.NO2IbRms = URmsCalc(DataBuf.NO2Ib , &NO2IBRegs, CONST_W) * 2;
+	PwmIsrReg.NO2IcRms = URmsCalc(DataBuf.NO2Ic , &NO2ICRegs, CONST_W) * 2;
+
+	PwmIsrReg.NO1IRms = (PwmIsrReg.NO1IaRms + PwmIsrReg.NO1IbRms + PwmIsrReg.NO1IcRms) * 0.3333;
+	PwmIsrReg.NO2IRms = (PwmIsrReg.NO2IaRms + PwmIsrReg.NO2IbRms + PwmIsrReg.NO2IcRms) * 0.3333;
+
+// 5、计算每路模块温度值
+	PwmIsrReg.TempARms = URmsCalc(DataBuf.TempA , &ModATempRegs, CONST_W);
+	PwmIsrReg.TempBRms = URmsCalc(DataBuf.TempB , &ModBTempRegs, CONST_W);
+	PwmIsrReg.TempCRms = URmsCalc(DataBuf.TempC , &ModCTempRegs, CONST_W);
+
+	if (SystemState == SystemRun)	// 中断占用太多时间，导致无法运行SCI接收中断，需要在不用时屏蔽。
+	{
+		// 运行以后计算输出电压
+		FlagSysAlarm.bit.OutSPLLAlarm = SpllCalc(&SpllRegOut, DataBuf.OutUab, DataBuf.OutUbc);
+		PwmIsrReg.OutURms = ((int32)PwmIsrReg.OutURms * LPF_K1 + SpllRegOut.SpllVcdFineP) >> LPF_K2;
+
+/******************************电机软启动过程********************************/
+		if ((1 == FlagSystem.bit.SoftStart) && (0 == StateSystem.bit.SoftStartSuccess))
+		{
+			CountSystem.SoftStart++;
+			if (CountSystem.SoftStart >= 10800)							// 延迟3秒启动
+			{
+				CountSystem.SoftStart = 10800;
+				if (1 == FlagSystem.bit.NO1Preferred)						// NO.1路设置为主路软启动
+				{
+					if (1 == SpllRegNO1.SpllOk)
+					{
+						StateSystem.bit.SoftStartSuccess = MotorSoftStart(NO1_CHANNEL, &SpllRegNO1, 170, 256);
+						StateSystem.bit.NO1Active = 1;
+						StateSystem.bit.NO2Active = 0;
+						FlagSystem.bit.SoftDataSave = 1;
+					}
+				}
+				if (1 == FlagSystem.bit.NO2Preferred)						// NO.2路设置为主路软启动
+				{
+					if (1 == SpllRegNO2.SpllOk)
+					{
+						StateSystem.bit.SoftStartSuccess = MotorSoftStart(NO2_CHANNEL, &SpllRegNO2, 170, 256);
+						StateSystem.bit.NO1Active = 0;
+						StateSystem.bit.NO2Active = 1;
+						FlagSystem.bit.SoftDataSave = 1;
+					}
+				}
+			}
+		}
+		else
+		{
+			StateSystem.bit.SoftStartSuccess = 1;						// 无需软启动
+		}
+
+		/*************************END**********************/
+
+/***************************投切过程********************************/
+		if(1 == StateSystem.bit.SoftStartSuccess)
+		{
+		/*----------------------NO1为主路-------------------------*/
+			if (1 == FlagSystem.bit.ChgNo1ToNo2)					// 主路往辅路切换
+			{
+				if (0 == StateSystem.bit.NO2Ready) 					// 切换成功后不再进入切换程序
+				{
+					StateSystem.bit.NO2Ready = BreakCloseNo1ToNo2();
+				}
+
+				if (1 == FlagSystem.bit.ABChannelOn)
+				{
+					CountAngle++;
+					if (CountAngle == CONST_Nd)                     // 延迟90度投入C相,@6400KHz
+					{
+						CountAngle = 0;
+						FlagSystem.bit.ABChannelOn = 0;
+						CtrlSCREnable(No2C);
+
+						FlagSystem.bit.AllchannelOn = 1;
+					}
+				}
+
+				if (1 == FlagSystem.bit.BCChannelOn)
+                {
+                    CountAngle++;
+                    if (CountAngle == CONST_Nd)                     // 延迟90度投入A相,@6400KHz
+                    {
+                        CountAngle = 0;
+                        FlagSystem.bit.BCChannelOn = 0;
+                        CtrlSCREnable(No2A);
+                        FlagSystem.bit.AllchannelOn = 1;
+                    }
+                }
+
+                if (1 == FlagSystem.bit.ACChannelOn)
+                {
+                    CountAngle++;
+                    if (CountAngle == CONST_Nd)                     // 延迟90度投入B相,@6400KHz
+                    {
+                        CountAngle = 0;
+                        FlagSystem.bit.ACChannelOn = 0;
+                        CtrlSCREnable(No2B);
+                        FlagSystem.bit.AllchannelOn = 1;
+                    }
+                }
+
+				if (1 == FlagSystem.bit.AllchannelOn)
+				{
+					FlagSystem.bit.AllchannelOn = 0;
+
+					StateSystem.bit.NO1Active = 0;
+					StateSystem.bit.NO2Active = 1;
+
+					FlagSystem.bit.ChgNo1ToNo2 = 0;
+					StateSystem.bit.NO2Ready = 0;
+				}
+			}
+
+		/*----------------------NO2为主路-------------------------*/
+			if (1 == FlagSystem.bit.ChgNo2ToNo1)
+			{
+			    FlagSystem.bit.Test++;
+				if (0 == StateSystem.bit.NO1Ready) 					// 切换成功后不再进入切换程序
+				{
+					StateSystem.bit.NO1Ready = BreakCloseNo2ToNo1();
+				}
+
+				if (FlagSystem.bit.ABChannelOn == 1)
+				{
+					CountAngle++;
+					if (CountAngle == CONST_Nd)                     // 延迟90度投入C相,@6400KHz
+					{
+						CountAngle = 0;
+						FlagSystem.bit.ABChannelOn = 0;
+						CtrlSCREnable(No1C);
+
+						FlagSystem.bit.AllchannelOn = 1;
+					}
+				}
+				if (1 == FlagSystem.bit.AllchannelOn)
+				{
+					FlagSystem.bit.AllchannelOn = 0;
+
+					StateSystem.bit.NO1Active = 1;
+					StateSystem.bit.NO2Active = 0;
+
+					FlagSystem.bit.ChgNo2ToNo1 = 0;
+					StateSystem.bit.NO1Ready = 0;
+				}
+			}
+		}
+	}
+		/*************************END**********************/
+
+	CountSystem.T1Cycle = (CpuTimer2Regs.PRD.all - CpuTimer2Regs.TIM.all) * 0.0066;			// us
+
+	EINT;
+}
+
+/*---------------------------------------------------------------------
+函数原型：interrupt void TZ1_ISR(void)
+函数名称：TZ1中断
+函数功能：
+入口参数：无
+出口参数：无
+作    者：
+日    期：
+----------------------------------------------------------------------*/
+interrupt void TZ1_ISR(void)
+{
+   	PieCtrlRegs.PIEACK.all = PIEACK_GROUP2;
+
+   	FlagSysRunErr.bit.FlagPDP = 1;
+	DisablePWM(EPWM_ALL);              	// close all the pwm pulse;
+
+	EALLOW;
+   	EPwm1Regs.TZCLR.all = 0x07;
+    EPwm2Regs.TZCLR.all = 0x07;
+    EPwm3Regs.TZCLR.all = 0x07;
+    EPwm5Regs.TZCLR.all = 0x07;
+    EPwm6Regs.TZCLR.all = 0x07;
+	EDIS;
+
+	// Enable PIE: Group 2 interrupt 1
+	PieCtrlRegs.PIEIER2.bit.INTx1 = 0;
+}
+
+/*---------------------------------------------------------------------
+函数原型：Uint16 BreakCloseNo1ToNo2(void)
+函数名称：NO1切往NO2
+函数功能：
+入口参数:
+出口参数：1 成功
+作    者：
+日    期：
+----------------------------------------------------------------------*/
+#pragma CODE_SECTION(BreakCloseNo1ToNo2, "ramcode")
+
+Uint16 BreakCloseNo1ToNo2(void)
+{
+	static Uint16 flag = 0;
+	CtrlSCRDisable(NO1_CHANNEL);
+	if (0 == flag)
+	{
+		flag = NO1CurZeroCrossDetec();
+	}
+	if (flag == 1)
+	{
+		CountSystem.NO1ZeroCrossDelay = 0;
+		if (abs(SpllRegNO2.SpllTheta - SpllRegOut.SpllTheta) < 28)				// 辅路相位和输出相位小于10°
+		{
+			CtrlSCREnable(NO2_CHANNEL);
+			FlagSystem.bit.AllchannelOn = 1;
+			FlagSystem.bit.DelayTransform ++;
+			flag = 0;
+			return 1;
+		}
+		else if (PwmIsrReg.OutURms < VRMS_80PERCENT)
+		{
+			if (SpllRegUFO.ThetaA == 80)										// 未追踪到同步，分相投入
+			{
+				CtrlSCREnable(NO2_ABCHANNEL);
+				FlagSystem.bit.ABChannelOn = 1;
+				FlagSystem.bit.ALock ++;
+				flag = 0;
+				return 1;
+			}
+			else if (SpllRegUFO.ThetaB == 80)                                        // 未追踪到同步，分相投入
+            {
+                CtrlSCREnable(NO2_BCCHANNEL);
+                FlagSystem.bit.BCChannelOn = 1;
+                FlagSystem.bit.BLock ++;
+                flag = 0;
+                return 1;
+            }
+			else if (SpllRegUFO.ThetaC == 80)                                        // 未追踪到同步，分相投入
+            {
+                CtrlSCREnable(NO2_ACCHANNEL);
+                FlagSystem.bit.ACChannelOn = 1;
+                FlagSystem.bit.CLock ++;
+                flag = 0;
+                return 1;
+            }
+			else if (PwmIsrReg.OutURms < VRMS_70PERCENT)						// 输出电压低于80%正常电压直接切换
+			{
+				CtrlSCREnable(NO2_CHANNEL);
+				FlagSystem.bit.AllchannelOn = 1;
+				FlagSystem.bit.InstantTransform ++;
+				flag = 0;
+				return 1;
+			}
+			else
+			{
+				return 0;
+			}
+		}
+		else
+		{
+			return 0;
+		}
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+/*---------------------------------------------------------------------
+函数原型：Uint16 BreakCloseNo2ToNo1(void)
+函数名称：NO2切往NO1
+函数功能：
+入口参数：无
+出口参数：1 成功
+作    者：
+日    期：
+----------------------------------------------------------------------*/
+#pragma CODE_SECTION(BreakCloseNo2ToNo1, "ramcode")
+
+Uint16 BreakCloseNo2ToNo1(void)
+{
+	static Uint16 flag = 0;
+	CtrlSCRDisable(NO2_CHANNEL);
+	if (0 == flag)
+	{
+		flag = NO2CurZeroCrossDetec();
+	}
+	if (flag == 1)
+	{
+		CountSystem.NO2ZeroCrossDelay = 0;
+		if (abs(SpllRegNO1.SpllTheta - SpllRegOut.SpllTheta) < 28)				// 辅路相位和输出相位小于10°
+		{
+			CtrlSCREnable(NO1_CHANNEL);
+			FlagSystem.bit.AllchannelOn = 1;
+			flag = 0;
+			return 1;
+		}
+		else if (PwmIsrReg.OutURms < VRMS_80PERCENT)
+		{
+			if (SpllRegUFO.ThetaA == 75)										// 未追踪到同步，分相投入
+			{
+				CtrlSCREnable(NO1_ABCHANNEL);
+				FlagSystem.bit.ABChannelOn = 1;
+				flag = 0;
+				return 1;
+			}
+			else if (PwmIsrReg.OutURms < VRMS_70PERCENT)						// 输出电压低于80%正常电压直接切换
+			{
+				CtrlSCREnable(NO1_CHANNEL);
+				FlagSystem.bit.AllchannelOn = 1;
+				flag = 0;
+				return 1;
+			}
+			else
+			{
+				return 0;
+			}
+		}
+		else
+		{
+			return 0;
+		}
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+/*---------------------------------------------------------------------
+函数原型：Uint16 NO1CurZeroCrossDetec(void)
+函数名称：主路电源过零检测
+函数功能：
+入口参数：无
+出口参数：1 成功
+作    者：
+日    期：
+----------------------------------------------------------------------*/
+#pragma CODE_SECTION(NO1CurZeroCrossDetec, "ramcode")
+
+Uint16 NO1CurZeroCrossDetec(void)
+{
+	CountSystem.NO1ZeroCrossDelay++;
+	if((CountSystem.NO1ZeroCrossDelay >= 51) && (CountSystem.NO1ZeroCrossDelay < 96))	// 8ms~15ms @6.4KHz
+	{
+//		 阻性负载
+//		if((abs(DataBuf.OutUab) < 300) && (abs(DataBuf.OutUbc) < 300))
+//		{
+			CountSystem.NO1ZeroCrossDelay = 0;
+			return 1;
+//		}
+//		else
+//		{
+//			return 0;
+//		}
+	}
+	else if(CountSystem.NO1ZeroCrossDelay >= 96)	// 15ms @6.4KHz
+	{
+		CountSystem.NO1ZeroCrossDelay = 0;
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+/*---------------------------------------------------------------------
+函数原型：Uint16 NO2CurZeroCrossDetec(void)
+函数名称：辅路电源过零检测
+函数功能：
+入口参数：无
+出口参数：1 成功
+作    者：
+日    期：
+----------------------------------------------------------------------*/
+#pragma CODE_SECTION(NO2CurZeroCrossDetec, "ramcode")
+
+Uint16 NO2CurZeroCrossDetec(void)
+{
+	CountSystem.NO2ZeroCrossDelay++;
+	if((CountSystem.NO2ZeroCrossDelay >= 51) &&	(CountSystem.NO2ZeroCrossDelay < 96))	// 8ms~15ms @6.4KHz
+	{
+//		 阻性负载
+//		if((abs(DataBuf.OutUab) < 300) && (abs(DataBuf.OutUbc) < 300))
+//		{
+			CountSystem.NO2ZeroCrossDelay = 0;
+			return 1;
+//		}
+//		else
+//		{
+//			return 0;
+//		}
+	}
+	else if(CountSystem.NO2ZeroCrossDelay >= 96)	// 15ms @6.4KHz
+	{
+		CountSystem.NO2ZeroCrossDelay = 0;
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+/*---------------------------------------------------------------------
+函数原型：void ThetaCalculate(struct SPLL_REG *spllreg)
+函数名称：主电相位过零点矫正
+函数功能：
+入口参数：
+出口参数：无
+作    者：
+日    期：2015年12月
+----------------------------------------------------------------------*/
+#pragma CODE_SECTION(ThetaCalculate, "ramcode")
+
+void ThetaCalculate(struct SPLL_REGS *spllreg)
+{
+    int16 TempTheta;
+
+    TempTheta = ((Uint32)spllreg->SpllTheta * 360) >> 10;
+
+	spllreg->ThetaA = TempTheta + 90;
+    if (spllreg->ThetaA > 360)
+    {
+        spllreg->ThetaA = spllreg->ThetaA - 360;
+    }
+
+	spllreg->ThetaB = spllreg->ThetaA - 120;
+	if (spllreg->ThetaB < 0)
+	{
+		spllreg->ThetaB = spllreg->ThetaB + 360;
+	}
+
+	spllreg->ThetaC = spllreg->ThetaA - 240;
+	if (spllreg->ThetaC < 0)
+	{
+		spllreg->ThetaC = spllreg->ThetaC + 360;
+	}
+}
+
+#pragma CODE_SECTION(SaveT1VarToPara, "ramcode")
+
+void SaveT1VarToPara(void)
+{
+	ParaTable.PWMReg.uNO1Uab 	    = DataBuf.NO1Uab;
+	ParaTable.PWMReg.uNO1Ubc 	    = DataBuf.NO1Ubc;
+	ParaTable.PWMReg.uNO1URms	    = PwmIsrReg.NO1URms;
+	ParaTable.PWMReg.uNO1Ia		    = DataBuf.NO1Ia;
+	ParaTable.PWMReg.uNO1Ib		    = DataBuf.NO1Ib;
+	ParaTable.PWMReg.uNO1Ic		    = DataBuf.NO1Ic;
+	ParaTable.PWMReg.uNO1IaRms      = PwmIsrReg.NO1IaRms;
+	ParaTable.PWMReg.uNO1IbRms      = PwmIsrReg.NO1IbRms;
+	ParaTable.PWMReg.uNO1IcRms      = PwmIsrReg.NO1IcRms;
+	ParaTable.PWMReg.uNO1IRms 	    = PwmIsrReg.NO1IRms;
+
+	ParaTable.PWMReg.uNO2Uab 	    = DataBuf.NO2Uab;
+	ParaTable.PWMReg.uNO2Ubc 	    = DataBuf.NO2Ubc;
+	ParaTable.PWMReg.uNO2URms	    = PwmIsrReg.NO2URms;
+	ParaTable.PWMReg.uNO2Ia		    = DataBuf.NO2Ia;
+	ParaTable.PWMReg.uNO2Ib		    = DataBuf.NO1Ib;
+	ParaTable.PWMReg.uNO2Ic		    = DataBuf.NO1Ic;
+	ParaTable.PWMReg.uNO2IaRms      = PwmIsrReg.NO2IaRms;
+	ParaTable.PWMReg.uNO2IbRms      = PwmIsrReg.NO2IbRms;
+	ParaTable.PWMReg.uNO2IcRms      = PwmIsrReg.NO2IcRms;
+	ParaTable.PWMReg.uNO2IRms 	    = PwmIsrReg.NO2IRms;
+
+	ParaTable.PWMReg.uOutUab 	    = DataBuf.OutUab;
+	ParaTable.PWMReg.uOutUbc 	    = DataBuf.OutUbc;
+	ParaTable.PWMReg.uOutURms	    = PwmIsrReg.OutURms;
+
+	ParaTable.PWMReg.uNO1Theta      = SpllRegNO1.SpllTheta;
+    ParaTable.PWMReg.uNO2Theta      = SpllRegNO2.SpllTheta;
+    ParaTable.PWMReg.uOutTheta      = SpllRegOut.SpllTheta;
+
+	ParaTable.PWMReg.uT1UseTime     = CountSystem.T1Cycle;
+	ParaTable.PWMReg.uModATemp	    = PwmIsrReg.TempARms;
+	ParaTable.PWMReg.uModBTemp	    = PwmIsrReg.TempBRms;
+	ParaTable.PWMReg.uModCTemp	    = PwmIsrReg.TempCRms;
+
+    ParaTable.PWMReg.uActiveReg0    = FlagSystem.bit.DelayTransform;
+	ParaTable.PWMReg.uActiveReg1    = FlagSystem.bit.ALock;
+	ParaTable.PWMReg.uActiveReg2    = FlagSystem.bit.BLock;
+	ParaTable.PWMReg.uActiveReg3    = FlagSystem.bit.CLock;
+	ParaTable.PWMReg.uActiveReg4    = FlagSystem.bit.InstantTransform;
+	ParaTable.PWMReg.uActiveReg5    = FlagSystem.bit.Test;
+	ParaTable.PWMReg.uActiveReg6    = 0;
+	ParaTable.PWMReg.uActiveReg7    = 0;
+	ParaTable.PWMReg.uActiveReg8    = 0;
+	ParaTable.PWMReg.uActiveReg9    = 0;
+
+/*----------------------------------------------------------*
+*                   以下为重要数据掉电保存，不允许修改               *
+*-----------------------------------------------------------*/
+	ParaTable.EmergencyReg.uEmCountBlock = EmgcRamReg.CountBlock;
+	ParaTable.EmergencyReg.uEmCountRam   = EmgcRamReg.CountRam;
+	ParaTable.EmergencyReg.uEmData0Addr  = (int16)((int32)EmDataAddrArray[0] & 0x0000ffff);
+	ParaTable.EmergencyReg.uEmData1Addr  = (int16)((int32)EmDataAddrArray[1] & 0x0000ffff);
+	ParaTable.EmergencyReg.uEmData2Addr  = (int16)((int32)EmDataAddrArray[2] & 0x0000ffff);
+	ParaTable.EmergencyReg.uEmData3Addr  = (int16)((int32)EmDataAddrArray[3] & 0x0000ffff);
+	ParaTable.EmergencyReg.uEmData4Addr  = (int16)((int32)EmDataAddrArray[4] & 0x0000ffff);
+	ParaTable.EmergencyReg.uEmData5Addr  = (int16)((int32)EmDataAddrArray[5] & 0x0000ffff);
+	ParaTable.EmergencyReg.uEmData6Addr  = (int16)((int32)EmDataAddrArray[6] & 0x0000ffff);
+	ParaTable.EmergencyReg.uEmData7Addr  = (int16)((int32)EmDataAddrArray[7] & 0x0000ffff);
+	ParaTable.EmergencyReg.uEmDataChgFlag        = FlagSystem.bit.EmDataChgFlag;
+	ParaTable.EmergencyReg.uEmDataSaveFinishFlag = EmgcRamReg.FlagDataSaveFinish;
+	ParaTable.EmergencyReg.uEmDataFlashWriteOK   = FlagSystem.bit.EmDataFlashWriteOK;
+}

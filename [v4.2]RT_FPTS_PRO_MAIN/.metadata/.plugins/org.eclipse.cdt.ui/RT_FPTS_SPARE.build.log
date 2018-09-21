@@ -1,0 +1,13 @@
+
+**** Clean-only build of configuration Debug for project RT_FPTS_SPARE ****
+
+"C:\\ti\\ccsv6\\utils\\bin\\gmake" -k clean 
+DEL /F  "RT_FPTS_SPARE.out"  "RT_FPTS_SPARE.hex" 
+DEL /F "source\DSP2833x_Adc.d" "source\DSP2833x_CpuTimers.d" "source\DSP2833x_DMA.d" "source\DSP2833x_DefaultIsr.d" "source\DSP2833x_Delay.d" "source\DSP2833x_ECan.d" "source\DSP2833x_GlobalVariableDefs.d" "source\DSP2833x_MemCopy.d" "source\DSP2833x_PieCtrl.d" "source\DSP2833x_PieVect.d" "source\DSP2833x_Sci.d" "source\DSP2833x_SysCtrl.d" "source\DSP2833x_Xintf.d" "source\USERS_Arithmetic.d" "source\USERS_Cap.d" "source\USERS_Cpld.d" "source\USERS_DigitalIo.d" "source\USERS_EPwm.d" "source\USERS_ExRam.d" "source\USERS_Flash.d" "source\USERS_Main.d" "source\USERS_Modbus.d" "source\USERS_ParaTab.d" "source\USERS_Protect.d" "source\USERS_T1_PWM.d" "source\USERS_T4.d" 
+DEL /F "source\DSP2833x_ADC_cal.obj" "source\DSP2833x_Adc.obj" "source\DSP2833x_CSMPasswords.obj" "source\DSP2833x_CodeStartBranch.obj" "source\DSP2833x_CpuTimers.obj" "source\DSP2833x_DMA.obj" "source\DSP2833x_DefaultIsr.obj" "source\DSP2833x_Delay.obj" "source\DSP2833x_ECan.obj" "source\DSP2833x_GlobalVariableDefs.obj" "source\DSP2833x_MemCopy.obj" "source\DSP2833x_PieCtrl.obj" "source\DSP2833x_PieVect.obj" "source\DSP2833x_Sci.obj" "source\DSP2833x_SysCtrl.obj" "source\DSP2833x_Xintf.obj" "source\DSP2833x_usDelay.obj" "source\USERS_Arithmetic.obj" "source\USERS_Cap.obj" "source\USERS_Cpld.obj" "source\USERS_DigitalIo.obj" "source\USERS_EPwm.obj" "source\USERS_ExRam.obj" "source\USERS_Flash.obj" "source\USERS_Main.obj" "source\USERS_Modbus.obj" "source\USERS_ParaTab.obj" "source\USERS_Protect.obj" "source\USERS_T1_PWM.obj" "source\USERS_T4.obj" 
+DEL /F "source\DSP2833x_ADC_cal.d" "source\DSP2833x_CSMPasswords.d" "source\DSP2833x_CodeStartBranch.d" "source\DSP2833x_usDelay.d" 
+’“≤ªµΩ E:\tangkf\DSP_Soft\Soft28335\RT-FPTS\[v4.2]RT_FPTS_PRO_MAIN\RT_FPTS_SPARE\Debug\source\DSP2833x_ADC_cal.d
+'Finished clean'
+' '
+
+**** Build Finished ****
