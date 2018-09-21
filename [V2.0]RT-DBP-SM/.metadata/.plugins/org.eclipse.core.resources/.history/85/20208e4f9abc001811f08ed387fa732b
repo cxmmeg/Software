@@ -131,7 +131,7 @@ interrupt void ePWM1ISR(void)
 	if (SystemState == SystemRun)	// 中断占用太多时间，导致无法运行SCI接收中断，需要在不用时屏蔽。
 	{
 		// 3、计算输出有功、无功
-		PowerCal(&PowerInst, RegSystem.OutVolTheta, DataBuf.Uab, DataBuf.Ubc, DataBuf.Iu, DataBuf.Iw);
+		PowerCal(&PowerInst, RegSystem.OutVolTheta, DataBuf.Uab, DataBuf.Ubc, DataBuf.Ia, DataBuf.Ic);
 
 		// 4、计算SVPWM脉冲,开PWM脉冲
 		PICal(&VVVFReg.VolPI, PowerInst.UinstReg.Urms, VVVFReg.Uref);		// 输出电压有效值PI环

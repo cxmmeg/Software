@@ -2,10 +2,10 @@
 **** Build of configuration Debug for project RT-DBP-SM ****
 
 "C:\\ti\\ccsv6\\utils\\bin\\gmake" -k all 
-'Building file: ../source/USERS_T4.c'
+'Building file: ../source/DSP2833x_ECan.c'
 'Invoking: C2000 Compiler'
-"C:/ti/ccsv6/tools/compiler/ti-cgt-c2000_15.12.1.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/ti-cgt-c2000_15.12.1.LTS/include" --include_path="F:/JSCSTKF/Software/[V2.0]RT-DBP-SM/RT-DBP-SM/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/USERS_T4.d" --obj_directory="source"  "../source/USERS_T4.c"
-'Finished building: ../source/USERS_T4.c'
+"C:/ti/ccsv6/tools/compiler/ti-cgt-c2000_15.12.1.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --include_path="C:/ti/ccsv6/tools/compiler/ti-cgt-c2000_15.12.1.LTS/include" --include_path="F:/JSCSTKF/Software/[V2.0]RT-DBP-SM/RT-DBP-SM/include" -g --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="source/DSP2833x_ECan.d" --obj_directory="source"  "../source/DSP2833x_ECan.c"
+'Finished building: ../source/DSP2833x_ECan.c'
 ' '
 'Building target: RT-DBP-SM.out'
 'Invoking: C2000 Linker'

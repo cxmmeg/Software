@@ -136,7 +136,7 @@ void WtiteDefaultToFlash(void)
 	ParaTable.RunCtrlReg.XSMaxInVol			= 10000;	// 输入电压满量程值
 	ParaTable.RunCtrlReg.XSMaxInCur			= 6800;		// 输入电流满量程值
 	ParaTable.RunCtrlReg.XSMaxBoostCur		= 6800;		// Bosst升压电流满量程值
-	ParaTable.RunCtrlReg.XSMaxOutVol		= 10650;	// 输出电压满量程值
+	ParaTable.RunCtrlReg.XSMaxOutVol		= 10000;	// 输出电压满量程值
 	ParaTable.RunCtrlReg.XSMaxOutCur		= 10000;	// 输出电流满量程值
 	ParaTable.RunCtrlReg.XSMaxNTCTemp		= 6800;		// 温度满量程值
 	ParaTable.RunCtrlReg.XSMaxSpeed			= 1024;		// 速度满量程值

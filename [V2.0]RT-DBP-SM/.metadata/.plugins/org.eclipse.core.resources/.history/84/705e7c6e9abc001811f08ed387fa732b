@@ -407,7 +407,7 @@ void SaveT4VarToPara(void)
 	ParaTable.Timer1Reg.uBoost3CurRms	= 52;	// Boost3升压电流有效值
 
     ParaTable.Timer1Reg.uOutVolRms 		= ((Uint32)PowerInst.UinstReg.Urms * ParaTable.PowerReg.uOutputVol) >> 12;	// 输出电压有效值
-	ParaTable.Timer1Reg.uOutCurRms	   	= ((Uint32)PowerInst.IinstReg.Urms * ParaTable.PowerReg.uOutputCur) >> 12;	// 输出电流有效值
+	ParaTable.Timer1Reg.uOutCurRms	   	= ((Uint32)PowerInst.IinstReg.Urms * ;	// 输出电流有效值
 	ParaTable.Timer1Reg.uOutFre	    	= ((Uint32)RegSystem.OutVolWeReal * ParaTable.PowerReg.uOutputFre) >> 10;	// 输出频率
 
 	ParaTable.Timer1Reg.uOutActivePower 	= ((int32)PowerInst.PowerAvgP * ParaTable.PowerReg.uOutputPower) >> 12;
